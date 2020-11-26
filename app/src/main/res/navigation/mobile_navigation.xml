@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@+id/nav_prenota">
+
+    <fragment
+        android:id="@+id/nav_prenota"
+        android:name="it.unito.ium_android.ui.prenota.PrenotaFragment"
+        android:label="@string/prenota"
+        tools:layout="@layout/fragment_prenota" />
+
+    <fragment
+        android:id="@+id/nav_prenotazioni"
+        android:name="it.unito.ium_android.ui.prenotazioni.PrenotazioniFragment"
+        android:label="@string/prenotazioni"
+        tools:layout="@layout/fragment_prenotazioni" />
+
+    <fragment
+        android:id="@+id/nav_login"
+        android:name="it.unito.ium_android.ui.login.LoginFragment"
+        android:label="@string/login"
+        tools:layout="@layout/fragment_login" />
+</navigation>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_prenota"
+            android:icon="@drawable/ic_baseline_add_box_24"
+            android:title="@string/prenota" />
+        <item
+            android:id="@+id/nav_prenotazioni"
+            android:icon="@drawable/ic_baseline_folder_24"
+            android:title="@string/prenotazioni" />
+        <item
+            android:id="@+id/nav_login"
+            android:icon="@drawable/ic_baseline_account_circle_24"
+            android:title="@string/login" />
+    </group>
+</menu>
