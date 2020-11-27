@@ -4,4 +4,26 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.prenota.PrenotaFragment"/>
+    tools:context=".ui.prenota.PrenotaFragment">
+
+    <Spinner
+        android:id="@+id/seleziona_materia"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toTopOf="@+id/seleziona_docente"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Spinner
+        android:id="@+id/seleziona_docente"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toTopOf="@+id/cardsContainer"
+        app:layout_constraintTop_toBottomOf="@+id/seleziona_materia" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/cardsContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/seleziona_docente" />
+</androidx.constraintlayout.widget.ConstraintLayout>
