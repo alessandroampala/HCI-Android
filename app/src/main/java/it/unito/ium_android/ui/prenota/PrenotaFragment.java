@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -29,25 +30,30 @@ public class PrenotaFragment extends Fragment {
     private PrenotaViewModel prenotaViewModel;
     private String materia = "";
     private String docente = "";
+    private boolean firstTimeSpinner = true;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         prenotaViewModel =
                 new ViewModelProvider(this).get(PrenotaViewModel.class);
         View root = inflater.inflate(R.layout.fragment_prenota, container, false);
-        /*String data = "action=getSessionLogin";
+
+        RelativeLayout loadingLayout = (RelativeLayout) root.findViewById(R.id.loadingPanel);
+
+        Requests requests = new Requests(getActivity(), "getSessionLogin");
+        String data = "action=getSessionLogin";
         String url = "http://10.0.2.2:8080/ProgettoTWEB_war_exploded/Controller";
         String method = "POST";
-        post.execute(data, url, method);*/
-
-        Requests requests = new Requests(getActivity().getApplicationContext(), "docenti", root);
-
-        String data = "";
-        String url = "http://10.0.2.2:8080/ProgettoTWEB_war_exploded/Controller?action=docenti";
-        String method = "GET";
         requests.execute(data, url, method);
 
-        requests = new Requests(getActivity().getApplicationContext(), "materie", root);
+        requests = new Requests(getActivity(), "docenti", root);
+
+        data = "";
+        url = "http://10.0.2.2:8080/ProgettoTWEB_war_exploded/Controller?action=docenti";
+        method = "GET";
+        requests.execute(data, url, method);
+
+        requests = new Requests(getActivity(), "materie", root);
 
         data = "";
         url = "http://10.0.2.2:8080/ProgettoTWEB_war_exploded/Controller?action=materie";
@@ -60,11 +66,16 @@ public class PrenotaFragment extends Fragment {
         spinnerDocenti.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (firstTimeSpinner) {
+                    firstTimeSpinner = false;
+                    return;
+                }
+                loadingLayout.setVisibility(root.VISIBLE);
                 docente = ((Integer) view.getTag()).toString();
                 if (docente.equals("0"))
                     docente = "";
 
-                Requests requests = new Requests(getActivity().getApplicationContext(), "lessons", root);
+                Requests requests = new Requests(getActivity(), "lessons", root);
                 try {
                     String data = "course=" + URLEncoder.encode(materia, "UTF-8") + "&teacherId=" + URLEncoder.encode(docente, "UTF-8") + "&action=lessons";
                     String url = "http://10.0.2.2:8080/ProgettoTWEB_war_exploded/Controller";
@@ -84,11 +95,16 @@ public class PrenotaFragment extends Fragment {
         spinnerMaterie.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (firstTimeSpinner) {
+                    firstTimeSpinner = false;
+                    return;
+                }
+                loadingLayout.setVisibility(root.VISIBLE);
                 String materia = ((TextView) view).getText().toString();
                 if (materia.equals("Seleziona Materia"))
                     materia = "";
 
-                Requests requests = new Requests(getActivity().getApplicationContext(), "lessons", root);
+                Requests requests = new Requests(getActivity(), "lessons", root);
                 try {
                     String data = "course=" + URLEncoder.encode(materia, "UTF-8") + "&teacherId=" + URLEncoder.encode(docente, "UTF-8") + "&action=lessons";
                     String url = "http://10.0.2.2:8080/ProgettoTWEB_war_exploded/Controller";

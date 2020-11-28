@@ -36,7 +36,7 @@ public class LoginFragment extends Fragment {
                 if (username.equals("") || password.equals("")) {
                     Toast.makeText(getActivity().getApplicationContext(), "Username e/o Password sbagliati", Toast.LENGTH_SHORT).show();
                 } else {
-                    Requests post = new Requests(getActivity().getApplicationContext(), "login");
+                    Requests post = new Requests(getActivity(), "login");
                     try {
                         String data = "username=" + URLEncoder.encode(username, "UTF-8") + "&password=" + URLEncoder.encode(password, "UTF-8") + "&action=login";
                         String url = "http://10.0.2.2:8080/ProgettoTWEB_war_exploded/Controller";

@@ -6,4 +6,5 @@
     <string name="nome_cognome">Nome Cognome</string>
     <string name="username">Username</string>
     <string name="password">Password</string>
+    <string name="ospite">Ospite</string>
 </resources>

@@ -4,6 +4,8 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.view.Menu;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.material.navigation.NavigationView;
@@ -19,6 +21,8 @@ import androidx.appcompat.widget.Toolbar;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+
+import it.unito.ium_android.requests.Requests;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -49,4 +53,5 @@ public class MainActivity extends AppCompatActivity {
         return NavigationUI.navigateUp(navController, mAppBarConfiguration)
                 || super.onSupportNavigateUp();
     }
+
 }
