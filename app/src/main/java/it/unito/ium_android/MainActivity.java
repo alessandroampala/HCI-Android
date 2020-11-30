@@ -54,4 +54,13 @@ public class MainActivity extends AppCompatActivity {
                 || super.onSupportNavigateUp();
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Requests requests = new Requests(this, "getSessionLogin");
+        String data = "action=getSessionLogin";
+        String url = "http://10.0.2.2:8080/ProgettoTWEB_war_exploded/Controller";
+        String method = "POST";
+        requests.execute(data, url, method);
+    }
 }

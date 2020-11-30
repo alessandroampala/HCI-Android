@@ -13,6 +13,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -143,10 +144,16 @@ public class Requests extends AsyncTask<String, String, String> {
         if (result.getMessage().equals("Ok")) {
             Toast.makeText(activity.getApplicationContext(), "login fatto", Toast.LENGTH_SHORT).show();
             navigationView.getMenu().findItem(R.id.nav_login).setVisible(false);
+            navigationView.getMenu().findItem(R.id.nav_logout).setVisible(true);
+            navigationView.getMenu().findItem(R.id.nav_prenotazioni).setVisible(true);
+            navigationView.getMenu().getItem(0).setChecked(true);
+            Navigation.findNavController(activity, R.id.nav_host_fragment).navigate(R.id.nav_prenota);
             username.setText(result.getData().getUsername());
         } else {
             Toast.makeText(activity.getApplicationContext(), result.getMessage(), Toast.LENGTH_SHORT).show();
             navigationView.getMenu().findItem(R.id.nav_login).setVisible(true);
+            navigationView.getMenu().findItem(R.id.nav_logout).setVisible(false);
+            navigationView.getMenu().findItem(R.id.nav_prenotazioni).setVisible(false);
             username.setText("Ospite");
         }
     }
@@ -160,10 +167,15 @@ public class Requests extends AsyncTask<String, String, String> {
         if (result.getMessage().equals("Sessione valida")) {
             Toast.makeText(activity.getApplicationContext(), result.getData().getUsername(), Toast.LENGTH_SHORT).show();
             navigationView.getMenu().findItem(R.id.nav_login).setVisible(false);
+            navigationView.getMenu().findItem(R.id.nav_logout).setVisible(true);
+            navigationView.getMenu().findItem(R.id.nav_prenotazioni).setVisible(true);
+            navigationView.getMenu().getItem(0).setChecked(true);
             username.setText(result.getData().getUsername());
         } else {
             Toast.makeText(activity.getApplicationContext(), result.getMessage(), Toast.LENGTH_SHORT).show();
             navigationView.getMenu().findItem(R.id.nav_login).setVisible(true);
+            navigationView.getMenu().findItem(R.id.nav_logout).setVisible(false);
+            navigationView.getMenu().findItem(R.id.nav_prenotazioni).setVisible(false);
         }
     }
 
@@ -171,22 +183,27 @@ public class Requests extends AsyncTask<String, String, String> {
         jsonMessage<List<Lesson>> result = new Gson().fromJson(s, new TypeToken<jsonMessage<List<Lesson>>>() {
         }.getType());
 
+        RelativeLayout loadingLayout = (RelativeLayout) this.view.findViewById(R.id.loadingPanel);
+        RecyclerView cardsContainer = (RecyclerView) this.view.findViewById(R.id.cardsContainer);
+        TextView noLessons = (TextView) this.view.findViewById(R.id.noLessons);
+
         if (result.getMessage().equals("Ok")) {
-            RecyclerView cardsContainer = (RecyclerView) this.view.findViewById(R.id.cardsContainer);
             Spinner spinnerDocenti = (Spinner) this.view.findViewById(R.id.seleziona_docente);
             Spinner spinnerMaterie = (Spinner) this.view.findViewById(R.id.seleziona_materia);
-            RelativeLayout loadingLayout = (RelativeLayout) this.view.findViewById(R.id.loadingPanel);
             if (spinnerDocenti.getVisibility() == view.VISIBLE && spinnerMaterie.getVisibility() == view.VISIBLE && loadingLayout.getVisibility() == view.VISIBLE)
                 loadingLayout.setVisibility(view.GONE);
+            noLessons.setVisibility(view.GONE);
             cardsContainer.setVisibility(view.VISIBLE);
             cardsContainer.setHasFixedSize(true);
             cardsContainer.setLayoutManager(new LinearLayoutManager(this.activity.getApplicationContext(), LinearLayoutManager.VERTICAL, false));
-
             RecyclerView.Adapter cardsContainerAdapter = new CardsContainerAdapter(result.getData());
 
             cardsContainer.setAdapter(cardsContainerAdapter);
         } else {
             Toast.makeText(activity.getApplicationContext(), result.getMessage(), Toast.LENGTH_SHORT).show();
+            loadingLayout.setVisibility(view.GONE);
+            cardsContainer.setVisibility(view.GONE);
+            noLessons.setVisibility(view.VISIBLE);
         }
     }
 

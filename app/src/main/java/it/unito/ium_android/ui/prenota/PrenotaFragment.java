@@ -40,17 +40,13 @@ public class PrenotaFragment extends Fragment {
 
         RelativeLayout loadingLayout = (RelativeLayout) root.findViewById(R.id.loadingPanel);
 
-        Requests requests = new Requests(getActivity(), "getSessionLogin");
-        String data = "action=getSessionLogin";
-        String url = "http://10.0.2.2:8080/ProgettoTWEB_war_exploded/Controller";
-        String method = "POST";
-        requests.execute(data, url, method);
 
-        requests = new Requests(getActivity(), "docenti", root);
 
-        data = "";
-        url = "http://10.0.2.2:8080/ProgettoTWEB_war_exploded/Controller?action=docenti";
-        method = "GET";
+        Requests requests = new Requests(getActivity(), "docenti", root);
+
+        String data = "";
+        String url = "http://10.0.2.2:8080/ProgettoTWEB_war_exploded/Controller?action=docenti";
+        String method = "GET";
         requests.execute(data, url, method);
 
         requests = new Requests(getActivity(), "materie", root);
@@ -100,7 +96,7 @@ public class PrenotaFragment extends Fragment {
                     return;
                 }
                 loadingLayout.setVisibility(root.VISIBLE);
-                String materia = ((TextView) view).getText().toString();
+                materia = ((TextView) view).getText().toString();
                 if (materia.equals("Seleziona Materia"))
                     materia = "";
 
