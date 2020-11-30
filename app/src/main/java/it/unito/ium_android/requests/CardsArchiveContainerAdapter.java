@@ -1,5 +1,6 @@
 package it.unito.ium_android.requests;
 
+import android.app.Activity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,6 +9,10 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.button.MaterialButton;
+
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.List;
 
 import it.unito.ium_android.R;
@@ -36,6 +41,20 @@ public class CardsArchiveContainerAdapter extends RecyclerView.Adapter<CardsArch
         holder.docente.setText(booking.getTeacher().getName() + " " + booking.getTeacher().getSurname());
         holder.data.setText(lessonSlotToString(booking.getLessonSlot()));
 
+        holder.disdici.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Requests requests = new Requests((Activity) v.getContext(), "disdici", v.getRootView());
+                try {
+                    String data = "lessonSlot=" + URLEncoder.encode(String.valueOf(booking.getLessonSlot()), "UTF-8") + "&course=" + URLEncoder.encode(booking.getCourse(), "UTF-8") + "&teacherId=" + URLEncoder.encode(String.valueOf(booking.getTeacher().getId()), "UTF-8") + "&action=disdici";
+                    String url = "http://10.0.2.2:8080/ProgettoTWEB_war_exploded/Controller";
+                    String method = "POST";
+                    requests.execute(data, url, method);
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 
     @Override
@@ -47,6 +66,7 @@ public class CardsArchiveContainerAdapter extends RecyclerView.Adapter<CardsArch
     public static class CardsContainerViewHolder extends RecyclerView.ViewHolder {
 
         TextView materia, docente, data;
+        MaterialButton disdici;
 
         public CardsContainerViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -54,6 +74,7 @@ public class CardsArchiveContainerAdapter extends RecyclerView.Adapter<CardsArch
             materia = itemView.findViewById(R.id.materia);
             docente = itemView.findViewById(R.id.docente);
             data = itemView.findViewById(R.id.data);
+            disdici = itemView.findViewById(R.id.disdici);
         }
     }
 

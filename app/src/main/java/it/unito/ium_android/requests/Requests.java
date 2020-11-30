@@ -64,7 +64,7 @@ public class Requests extends AsyncTask<String, String, String> {
         }
         connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded; utf-8");
         connection.setRequestProperty("Content-Length", String.valueOf(strings[0].length()));
-        if (this.className.equals("getSessionLogin") || this.className.equals("getUserBookings")) {
+        if (this.className.equals("getSessionLogin") || this.className.equals("getUserBookings") || this.className.equals("disdici")) {
             SharedPreferences sharedPref = this.activity.getPreferences(this.activity.MODE_PRIVATE);
             String sessionId = "";
             if (sharedPref.contains("sessionId"))
@@ -130,6 +130,9 @@ public class Requests extends AsyncTask<String, String, String> {
                 break;
             case "getUserBookings":
                 lessonsArchive(s);
+                break;
+            case "disdici":
+                disdici(s);
                 break;
         }
 
@@ -250,9 +253,9 @@ public class Requests extends AsyncTask<String, String, String> {
         Collections.sort(result.getData());
         RelativeLayout loadingLayout = (RelativeLayout) this.view.findViewById(R.id.loadingPanel);
         TextView noBooking = (TextView) this.view.findViewById(R.id.noBooking);
+        RecyclerView cardsContainer = (RecyclerView) this.view.findViewById(R.id.cardsContainer);
 
         if (result.getMessage().equals("Ok")) {
-            RecyclerView cardsContainer = (RecyclerView) this.view.findViewById(R.id.cardsContainer);
             loadingLayout.setVisibility(view.GONE);
             cardsContainer.setVisibility(view.VISIBLE);
             cardsContainer.setHasFixedSize(true);
@@ -263,7 +266,21 @@ public class Requests extends AsyncTask<String, String, String> {
         } else {
             Toast.makeText(activity.getApplicationContext(), result.getMessage(), Toast.LENGTH_SHORT).show();
             loadingLayout.setVisibility(view.GONE);
+            cardsContainer.setVisibility(view.GONE);
             noBooking.setVisibility(view.VISIBLE);
+        }
+    }
+
+    private void disdici(String s) {
+        String result =  new Gson().fromJson(s, String.class);
+        if (result.equals("OK")) {
+            Requests requests = new Requests(activity, "getUserBookings", view);
+            String data = "action=userBooking&isAndroid=true";
+            String url = "http://10.0.2.2:8080/ProgettoTWEB_war_exploded/Controller";
+            String method = "GET";
+            requests.execute(data, url, method);
+        } else {
+            Toast.makeText(activity.getApplicationContext(), s, Toast.LENGTH_SHORT).show();
         }
     }
 }
