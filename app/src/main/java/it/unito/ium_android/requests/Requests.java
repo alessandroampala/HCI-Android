@@ -297,6 +297,7 @@ public class Requests extends AsyncTask<String, String, String> {
         TextView username = navigationView.findViewById(R.id.usernameTextView);
         Toast.makeText(activity.getApplicationContext(), "Logged out", Toast.LENGTH_SHORT).show();
         Navigation.findNavController(activity, R.id.nav_host_fragment).navigate(R.id.nav_prenota);
+        navigationView.setCheckedItem(R.id.nav_prenota);
         navigationView.getMenu().findItem(R.id.nav_login).setVisible(true);
         navigationView.getMenu().findItem(R.id.nav_logout).setVisible(false);
         navigationView.getMenu().findItem(R.id.nav_prenotazioni).setVisible(false);
