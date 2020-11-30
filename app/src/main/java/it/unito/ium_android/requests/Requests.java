@@ -1,13 +1,9 @@
 package it.unito.ium_android.requests;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
-import android.util.Log;
-import android.view.Menu;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -28,7 +24,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.ProtocolException;
 import java.net.URL;
-import java.net.URLEncoder;
+import java.util.Collections;
 import java.util.List;
 
 import it.unito.ium_android.R;
@@ -68,7 +64,7 @@ public class Requests extends AsyncTask<String, String, String> {
         }
         connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded; utf-8");
         connection.setRequestProperty("Content-Length", String.valueOf(strings[0].length()));
-        if (this.className.equals("getSessionLogin")) {
+        if (this.className.equals("getSessionLogin") || this.className.equals("getUserBookings")) {
             SharedPreferences sharedPref = this.activity.getPreferences(this.activity.MODE_PRIVATE);
             String sessionId = "";
             if (sharedPref.contains("sessionId"))
@@ -131,6 +127,9 @@ public class Requests extends AsyncTask<String, String, String> {
                 break;
             case "materie":
                 materie(s);
+                break;
+            case "getUserBookings":
+                lessonsArchive(s);
                 break;
         }
 
@@ -241,6 +240,30 @@ public class Requests extends AsyncTask<String, String, String> {
             spinnerMaterie.setAdapter(spinAdapterMaterie);
         } else {
             Toast.makeText(activity.getApplicationContext(), result.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void lessonsArchive(String s) {
+        jsonMessage<List<Booking>> result = new Gson().fromJson(s, new TypeToken<jsonMessage<List<Booking>>>() {
+        }.getType());
+
+        Collections.sort(result.getData());
+        RelativeLayout loadingLayout = (RelativeLayout) this.view.findViewById(R.id.loadingPanel);
+        TextView noBooking = (TextView) this.view.findViewById(R.id.noBooking);
+
+        if (result.getMessage().equals("Ok")) {
+            RecyclerView cardsContainer = (RecyclerView) this.view.findViewById(R.id.cardsContainer);
+            loadingLayout.setVisibility(view.GONE);
+            cardsContainer.setVisibility(view.VISIBLE);
+            cardsContainer.setHasFixedSize(true);
+            cardsContainer.setLayoutManager(new LinearLayoutManager(this.activity.getApplicationContext(), LinearLayoutManager.VERTICAL, false));
+            RecyclerView.Adapter cardsContainerAdapter = new CardsArchiveContainerAdapter(result.getData());
+            cardsContainer.setAdapter(cardsContainerAdapter);
+
+        } else {
+            Toast.makeText(activity.getApplicationContext(), result.getMessage(), Toast.LENGTH_SHORT).show();
+            loadingLayout.setVisibility(view.GONE);
+            noBooking.setVisibility(view.VISIBLE);
         }
     }
 }

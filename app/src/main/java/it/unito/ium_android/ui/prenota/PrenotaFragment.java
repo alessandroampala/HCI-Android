@@ -40,8 +40,6 @@ public class PrenotaFragment extends Fragment {
 
         RelativeLayout loadingLayout = (RelativeLayout) root.findViewById(R.id.loadingPanel);
 
-
-
         Requests requests = new Requests(getActivity(), "docenti", root);
 
         String data = "";

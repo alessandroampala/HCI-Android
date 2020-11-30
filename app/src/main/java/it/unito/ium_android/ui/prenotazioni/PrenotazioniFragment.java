@@ -12,7 +12,11 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+
 import it.unito.ium_android.R;
+import it.unito.ium_android.requests.Requests;
 
 public class PrenotazioniFragment extends Fragment {
 
@@ -23,6 +27,12 @@ public class PrenotazioniFragment extends Fragment {
         prenotazioniViewModel =
                 new ViewModelProvider(this).get(PrenotazioniViewModel.class);
         View root = inflater.inflate(R.layout.fragment_prenotazioni, container, false);
+
+        Requests requests = new Requests(getActivity(), "getUserBookings", root);
+        String data = "";
+        String url = "http://10.0.2.2:8080/ProgettoTWEB_war_exploded/Controller?action=userBooking";
+        String method = "GET";
+        requests.execute(data, url, method);
 
         return root;
     }
