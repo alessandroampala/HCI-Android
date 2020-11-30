@@ -64,7 +64,7 @@ public class Requests extends AsyncTask<String, String, String> {
         }
         connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded; utf-8");
         connection.setRequestProperty("Content-Length", String.valueOf(strings[0].length()));
-        if (this.className.equals("getSessionLogin") || this.className.equals("getUserBookings") || this.className.equals("disdici")) {
+        if (this.className.equals("getSessionLogin") || this.className.equals("getUserBookings") || this.className.equals("disdici") || this.className.equals("logout")) {
             SharedPreferences sharedPref = this.activity.getPreferences(this.activity.MODE_PRIVATE);
             String sessionId = "";
             if (sharedPref.contains("sessionId"))
@@ -94,6 +94,11 @@ public class Requests extends AsyncTask<String, String, String> {
                 SharedPreferences sharedPref = this.activity.getPreferences(this.activity.MODE_PRIVATE);
                 SharedPreferences.Editor editor = sharedPref.edit();
                 editor.putString("sessionId", cookie.substring(0, cookie.indexOf(";")));
+                editor.apply();
+            } else if(this.className.equals("logout")){
+                SharedPreferences sharedPref = this.activity.getPreferences(this.activity.MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedPref.edit();
+                editor.clear();
                 editor.apply();
             }
 
@@ -133,6 +138,9 @@ public class Requests extends AsyncTask<String, String, String> {
                 break;
             case "disdici":
                 disdici(s);
+                break;
+            case "logout":
+                logout(s);
                 break;
         }
 
@@ -272,7 +280,7 @@ public class Requests extends AsyncTask<String, String, String> {
     }
 
     private void disdici(String s) {
-        String result =  new Gson().fromJson(s, String.class);
+        String result = new Gson().fromJson(s, String.class);
         if (result.equals("OK")) {
             Requests requests = new Requests(activity, "getUserBookings", view);
             String data = "action=userBooking&isAndroid=true";
@@ -282,5 +290,16 @@ public class Requests extends AsyncTask<String, String, String> {
         } else {
             Toast.makeText(activity.getApplicationContext(), s, Toast.LENGTH_SHORT).show();
         }
+    }
+
+    private void logout(String s) {
+        NavigationView navigationView = activity.findViewById(R.id.nav_view);
+        TextView username = navigationView.findViewById(R.id.usernameTextView);
+        Toast.makeText(activity.getApplicationContext(), "Logged out", Toast.LENGTH_SHORT).show();
+        Navigation.findNavController(activity, R.id.nav_host_fragment).navigate(R.id.nav_prenota);
+        navigationView.getMenu().findItem(R.id.nav_login).setVisible(true);
+        navigationView.getMenu().findItem(R.id.nav_logout).setVisible(false);
+        navigationView.getMenu().findItem(R.id.nav_prenotazioni).setVisible(false);
+        username.setText("Ospite");
     }
 }
