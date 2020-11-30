@@ -29,8 +29,8 @@ public class PrenotazioniFragment extends Fragment {
         View root = inflater.inflate(R.layout.fragment_prenotazioni, container, false);
 
         Requests requests = new Requests(getActivity(), "getUserBookings", root);
-        String data = "";
-        String url = "http://10.0.2.2:8080/ProgettoTWEB_war_exploded/Controller?action=userBooking";
+        String data = "action=userBooking&isAndroid=true";
+        String url = "http://10.0.2.2:8080/ProgettoTWEB_war_exploded/Controller";
         String method = "GET";
         requests.execute(data, url, method);
 

@@ -32,8 +32,9 @@ public class CardsArchiveContainerAdapter extends RecyclerView.Adapter<CardsArch
     public void onBindViewHolder(@NonNull CardsArchiveContainerAdapter.CardsContainerViewHolder holder, int position) {
         Booking booking = this.data.get(position);
 
-        holder.materia.setText(booking.course);
-        holder.data.setText(lessonSlotToString(booking.lessonSlot));
+        holder.materia.setText(booking.getCourse());
+        holder.docente.setText(booking.getTeacher().getName() + " " + booking.getTeacher().getSurname());
+        holder.data.setText(lessonSlotToString(booking.getLessonSlot()));
 
     }
 

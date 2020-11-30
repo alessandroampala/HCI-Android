@@ -42,15 +42,15 @@ public class PrenotaFragment extends Fragment {
 
         Requests requests = new Requests(getActivity(), "docenti", root);
 
-        String data = "";
-        String url = "http://10.0.2.2:8080/ProgettoTWEB_war_exploded/Controller?action=docenti";
+        String data = "action=docenti";
+        String url = "http://10.0.2.2:8080/ProgettoTWEB_war_exploded/Controller";
         String method = "GET";
         requests.execute(data, url, method);
 
         requests = new Requests(getActivity(), "materie", root);
 
-        data = "";
-        url = "http://10.0.2.2:8080/ProgettoTWEB_war_exploded/Controller?action=materie";
+        data = "action=materie";
+        url = "http://10.0.2.2:8080/ProgettoTWEB_war_exploded/Controller";
         method = "GET";
         requests.execute(data, url, method);
 
