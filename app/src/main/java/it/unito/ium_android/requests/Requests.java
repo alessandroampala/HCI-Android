@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -64,7 +65,7 @@ public class Requests extends AsyncTask<String, String, String> {
         }
         connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded; utf-8");
         connection.setRequestProperty("Content-Length", String.valueOf(strings[0].length()));
-        if (this.className.equals("getSessionLogin") || this.className.equals("getUserBookings") || this.className.equals("disdici") || this.className.equals("logout")) {
+        if (this.className.equals("getSessionLogin") || this.className.equals("getUserBookings") || this.className.equals("oldUserBookings") || this.className.equals("disdici") || this.className.equals("logout")) {
             SharedPreferences sharedPref = this.activity.getPreferences(this.activity.MODE_PRIVATE);
             String sessionId = "";
             if (sharedPref.contains("sessionId"))
@@ -95,7 +96,7 @@ public class Requests extends AsyncTask<String, String, String> {
                 SharedPreferences.Editor editor = sharedPref.edit();
                 editor.putString("sessionId", cookie.substring(0, cookie.indexOf(";")));
                 editor.apply();
-            } else if(this.className.equals("logout")){
+            } else if (this.className.equals("logout")) {
                 SharedPreferences sharedPref = this.activity.getPreferences(this.activity.MODE_PRIVATE);
                 SharedPreferences.Editor editor = sharedPref.edit();
                 editor.clear();
@@ -135,6 +136,9 @@ public class Requests extends AsyncTask<String, String, String> {
                 break;
             case "getUserBookings":
                 lessonsArchive(s);
+                break;
+            case "oldUserBookings":
+                oldLessonsArchive(s);
                 break;
             case "disdici":
                 disdici(s);
@@ -258,24 +262,45 @@ public class Requests extends AsyncTask<String, String, String> {
         jsonMessage<List<Booking>> result = new Gson().fromJson(s, new TypeToken<jsonMessage<List<Booking>>>() {
         }.getType());
 
-        Collections.sort(result.getData());
         RelativeLayout loadingLayout = (RelativeLayout) this.view.findViewById(R.id.loadingPanel);
         TextView noBooking = (TextView) this.view.findViewById(R.id.noBooking);
         RecyclerView cardsContainer = (RecyclerView) this.view.findViewById(R.id.cardsContainer);
 
         if (result.getMessage().equals("Ok")) {
+            Collections.sort(result.getData());
             loadingLayout.setVisibility(view.GONE);
             cardsContainer.setVisibility(view.VISIBLE);
             cardsContainer.setHasFixedSize(true);
             cardsContainer.setLayoutManager(new LinearLayoutManager(this.activity.getApplicationContext(), LinearLayoutManager.VERTICAL, false));
             RecyclerView.Adapter cardsContainerAdapter = new CardsArchiveContainerAdapter(result.getData());
             cardsContainer.setAdapter(cardsContainerAdapter);
-
         } else {
             Toast.makeText(activity.getApplicationContext(), result.getMessage(), Toast.LENGTH_SHORT).show();
             loadingLayout.setVisibility(view.GONE);
             cardsContainer.setVisibility(view.GONE);
             noBooking.setVisibility(view.VISIBLE);
+        }
+    }
+
+    private void oldLessonsArchive(String s) {
+        jsonMessage<List<Booking>> result = new Gson().fromJson(s, new TypeToken<jsonMessage<List<Booking>>>() {
+        }.getType());
+
+        RelativeLayout loadingLayout = (RelativeLayout) this.view.findViewById(R.id.loadingPanel);
+        RecyclerView oldCardsContainer = (RecyclerView) this.view.findViewById(R.id.oldCardsContainer);
+
+        if (result.getMessage().equals("Ok")) {
+            Collections.sort(result.getData());
+            loadingLayout.setVisibility(view.GONE);
+            oldCardsContainer.setVisibility(view.VISIBLE);
+            oldCardsContainer.setHasFixedSize(true);
+            oldCardsContainer.setLayoutManager(new LinearLayoutManager(this.activity.getApplicationContext(), LinearLayoutManager.VERTICAL, false));
+            RecyclerView.Adapter oldCardsContainerAdapter = new CardsArchiveContainerAdapter(result.getData());
+            oldCardsContainer.setAdapter(oldCardsContainerAdapter);
+        } else {
+            Toast.makeText(activity.getApplicationContext(), result.getMessage(), Toast.LENGTH_SHORT).show();
+            loadingLayout.setVisibility(view.GONE);
+            oldCardsContainer.setVisibility(view.GONE);
         }
     }
 
@@ -286,6 +311,12 @@ public class Requests extends AsyncTask<String, String, String> {
             String data = "action=userBooking&isAndroid=true";
             String url = "http://10.0.2.2:8080/ProgettoTWEB_war_exploded/Controller";
             String method = "GET";
+            requests.execute(data, url, method);
+
+            requests = new Requests(activity, "oldUserBookings", view);
+            data = "action=oldUserBookings&isAndroid=true";
+            url = "http://10.0.2.2:8080/ProgettoTWEB_war_exploded/Controller";
+            method = "GET";
             requests.execute(data, url, method);
         } else {
             Toast.makeText(activity.getApplicationContext(), s, Toast.LENGTH_SHORT).show();

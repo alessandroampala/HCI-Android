@@ -11,6 +11,15 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
+        <TextView
+            android:id="@+id/noBooking"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Non ci sono ripetizioni attive."
+            android:layout_gravity="center"
+            android:visibility="gone" />
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/cardsContainer"
             android:layout_width="match_parent"
@@ -19,14 +28,13 @@
 
         </androidx.recyclerview.widget.RecyclerView>
 
-        <TextView
-            android:id="@+id/noBooking"
-            android:layout_width="wrap_content"
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/oldCardsContainer"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="Non ci sono ripetizioni."
-            android:layout_gravity="center"
-            android:visibility="gone" />
+            android:visibility="gone" >
+
+        </androidx.recyclerview.widget.RecyclerView>
 
         <RelativeLayout
             android:id="@+id/loadingPanel"

@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -40,21 +41,26 @@ public class CardsArchiveContainerAdapter extends RecyclerView.Adapter<CardsArch
         holder.materia.setText(booking.getCourse());
         holder.docente.setText(booking.getTeacher().getName() + " " + booking.getTeacher().getSurname());
         holder.data.setText(lessonSlotToString(booking.getLessonSlot()));
-
-        holder.disdici.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Requests requests = new Requests((Activity) v.getContext(), "disdici", v.getRootView());
-                try {
-                    String data = "lessonSlot=" + URLEncoder.encode(String.valueOf(booking.getLessonSlot()), "UTF-8") + "&course=" + URLEncoder.encode(booking.getCourse(), "UTF-8") + "&teacherId=" + URLEncoder.encode(String.valueOf(booking.getTeacher().getId()), "UTF-8") + "&action=disdici";
-                    String url = "http://10.0.2.2:8080/ProgettoTWEB_war_exploded/Controller";
-                    String method = "POST";
-                    requests.execute(data, url, method);
-                } catch (UnsupportedEncodingException e) {
-                    e.printStackTrace();
+        if (String.valueOf(booking.status).equals("ACTIVE")) {
+            holder.buttons.setVisibility(View.VISIBLE);
+            holder.disdici.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Requests requests = new Requests((Activity) v.getContext(), "disdici", v.getRootView());
+                    try {
+                        String data = "lessonSlot=" + URLEncoder.encode(String.valueOf(booking.getLessonSlot()), "UTF-8") + "&course=" + URLEncoder.encode(booking.getCourse(), "UTF-8") + "&teacherId=" + URLEncoder.encode(String.valueOf(booking.getTeacher().getId()), "UTF-8") + "&action=disdici";
+                        String url = "http://10.0.2.2:8080/ProgettoTWEB_war_exploded/Controller";
+                        String method = "POST";
+                        requests.execute(data, url, method);
+                    } catch (UnsupportedEncodingException e) {
+                        e.printStackTrace();
+                    }
                 }
-            }
-        });
+            });
+        } else {
+            holder.status.setVisibility(View.VISIBLE);
+            holder.status.setText(String.valueOf(booking.status));
+        }
     }
 
     @Override
@@ -65,16 +71,19 @@ public class CardsArchiveContainerAdapter extends RecyclerView.Adapter<CardsArch
 
     public static class CardsContainerViewHolder extends RecyclerView.ViewHolder {
 
-        TextView materia, docente, data;
+        TextView materia, docente, data, status;
         MaterialButton disdici;
+        LinearLayout buttons;
 
         public CardsContainerViewHolder(@NonNull View itemView) {
             super(itemView);
 
+            buttons = itemView.findViewById(R.id.buttons);
             materia = itemView.findViewById(R.id.materia);
             docente = itemView.findViewById(R.id.docente);
             data = itemView.findViewById(R.id.data);
             disdici = itemView.findViewById(R.id.disdici);
+            status = itemView.findViewById(R.id.status);
         }
     }
 
