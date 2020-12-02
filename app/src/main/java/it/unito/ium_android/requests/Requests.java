@@ -28,6 +28,7 @@ import java.net.URL;
 import java.util.Collections;
 import java.util.List;
 
+import it.unito.ium_android.MainActivity;
 import it.unito.ium_android.R;
 
 public class Requests extends AsyncTask<String, String, String> {
@@ -213,7 +214,7 @@ public class Requests extends AsyncTask<String, String, String> {
             cardsContainer.setVisibility(view.VISIBLE);
             cardsContainer.setHasFixedSize(true);
             cardsContainer.setLayoutManager(new LinearLayoutManager(this.activity.getApplicationContext(), LinearLayoutManager.VERTICAL, false));
-            RecyclerView.Adapter cardsContainerAdapter = new CardsContainerAdapter(result.getData());
+            RecyclerView.Adapter cardsContainerAdapter = new CardsContainerAdapter(result.getData(), (MainActivity) activity);
 
             cardsContainer.setAdapter(cardsContainerAdapter);
         } else {

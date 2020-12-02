@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/lun"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/lun"
+            app:layout_constraintEnd_toStartOf="@+id/mar"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/mar" />
+
+        <TextView
+            android:id="@+id/mar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/mar"
+            app:layout_constraintEnd_toStartOf="@+id/mer"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/lun"
+            app:layout_constraintTop_toTopOf="@+id/mer" />
+
+        <TextView
+            android:id="@+id/mer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/mer"
+            app:layout_constraintEnd_toStartOf="@+id/gio"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/mar"
+            app:layout_constraintTop_toTopOf="@+id/gio" />
+
+        <TextView
+            android:id="@+id/gio"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/gio"
+            app:layout_constraintEnd_toStartOf="@+id/ven"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/mer"
+            app:layout_constraintTop_toTopOf="@+id/ven" />
+
+        <TextView
+            android:id="@+id/ven"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:text="@string/ven"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/gio"
+            app:layout_constraintTop_toTopOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+</LinearLayout>

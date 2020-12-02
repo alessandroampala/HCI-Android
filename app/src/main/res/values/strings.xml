@@ -12,4 +12,9 @@
     <string name="disdici">Disdici</string>
     <string name="svolta">Svolta</string>
     <string name="status">Status</string>
+    <string name="lun">Lun</string>
+    <string name="mar">Mar</string>
+    <string name="mer">Mer</string>
+    <string name="gio">Gio</string>
+    <string name="ven">Ven</string>
 </resources>
