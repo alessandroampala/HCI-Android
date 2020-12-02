@@ -30,7 +30,7 @@ public class PrenotaFragment extends Fragment {
     private PrenotaViewModel prenotaViewModel;
     private String materia = "";
     private String docente = "";
-    private boolean firstTimeSpinner = true;
+    private int firstTimeSpinner = 0;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -40,28 +40,14 @@ public class PrenotaFragment extends Fragment {
 
         RelativeLayout loadingLayout = (RelativeLayout) root.findViewById(R.id.loadingPanel);
 
-        Requests requests = new Requests(getActivity(), "docenti", root);
-
-        String data = "action=docenti";
-        String url = "http://10.0.2.2:8080/ProgettoTWEB_war_exploded/Controller";
-        String method = "GET";
-        requests.execute(data, url, method);
-
-        requests = new Requests(getActivity(), "materie", root);
-
-        data = "action=materie";
-        url = "http://10.0.2.2:8080/ProgettoTWEB_war_exploded/Controller";
-        method = "GET";
-        requests.execute(data, url, method);
-
         Spinner spinnerDocenti = (Spinner) root.findViewById(R.id.seleziona_docente);
         Spinner spinnerMaterie = (Spinner) root.findViewById(R.id.seleziona_materia);
 
         spinnerDocenti.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if (firstTimeSpinner) {
-                    firstTimeSpinner = false;
+                if (firstTimeSpinner < 2) {
+                    firstTimeSpinner++;
                     return;
                 }
                 loadingLayout.setVisibility(root.VISIBLE);
@@ -89,8 +75,8 @@ public class PrenotaFragment extends Fragment {
         spinnerMaterie.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if (firstTimeSpinner) {
-                    firstTimeSpinner = false;
+                if (firstTimeSpinner < 2) {
+                    firstTimeSpinner++;
                     return;
                 }
                 loadingLayout.setVisibility(root.VISIBLE);
@@ -116,5 +102,34 @@ public class PrenotaFragment extends Fragment {
         });
 
         return root;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        firstTimeSpinner = 0;
+        Requests requests = new Requests(getActivity(), "docenti", getView());
+
+        String data = "action=docenti";
+        String url = "http://10.0.2.2:8080/ProgettoTWEB_war_exploded/Controller";
+        String method = "GET";
+        requests.execute(data, url, method);
+
+        requests = new Requests(getActivity(), "materie", getView());
+
+        data = "action=materie";
+        url = "http://10.0.2.2:8080/ProgettoTWEB_war_exploded/Controller";
+        method = "GET";
+        requests.execute(data, url, method);
+
+        requests = new Requests(getActivity(), "lessons", getView());
+        try {
+            data = "course=" + URLEncoder.encode(materia, "UTF-8") + "&teacherId=" + URLEncoder.encode(docente, "UTF-8") + "&action=lessons";
+            url = "http://10.0.2.2:8080/ProgettoTWEB_war_exploded/Controller";
+            method = "POST";
+            requests.execute(data, url, method);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
     }
 }
