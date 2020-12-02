@@ -308,8 +308,9 @@ public class Requests extends AsyncTask<String, String, String> {
     }
 
     private void disdici(String s) {
-        String result = new Gson().fromJson(s, String.class);
-        if (result.equals("OK")) {
+        jsonMessage<List<Object>> result = new Gson().fromJson(s,  new TypeToken<jsonMessage<List<Object>>>() {
+        }.getType());
+        if (result.getMessage().equals("OK")) {
             Requests requests = new Requests(activity, "getUserBookings", view);
             String data = "action=userBooking&isAndroid=true";
             String url = "http://10.0.2.2:8080/ProgettoTWEB_war_exploded/Controller";
@@ -317,18 +318,19 @@ public class Requests extends AsyncTask<String, String, String> {
             requests.execute(data, url, method);
 
             requests = new Requests(activity, "oldUserBookings", view);
-            data = "action=oldUserBookings&isAndroid=true";
+            data = "action=oldUserBookings";
             url = "http://10.0.2.2:8080/ProgettoTWEB_war_exploded/Controller";
             method = "GET";
             requests.execute(data, url, method);
         } else {
-            Toast.makeText(activity.getApplicationContext(), s, Toast.LENGTH_SHORT).show();
+            Toast.makeText(activity.getApplicationContext(), result.getMessage(), Toast.LENGTH_SHORT).show();
         }
     }
 
     private void svolta(String s) {
-        String result = new Gson().fromJson(s, String.class);
-        if (result.equals("OK")) {
+        jsonMessage<List<Object>> result = new Gson().fromJson(s, new TypeToken<jsonMessage<List<Object>>>() {
+        }.getType());
+        if (result.getMessage().equals("OK")) {
             Requests requests = new Requests(activity, "getUserBookings", view);
             String data = "action=userBooking&isAndroid=true";
             String url = "http://10.0.2.2:8080/ProgettoTWEB_war_exploded/Controller";
@@ -336,12 +338,12 @@ public class Requests extends AsyncTask<String, String, String> {
             requests.execute(data, url, method);
 
             requests = new Requests(activity, "oldUserBookings", view);
-            data = "action=oldUserBookings&isAndroid=true";
+            data = "action=oldUserBookings";
             url = "http://10.0.2.2:8080/ProgettoTWEB_war_exploded/Controller";
             method = "GET";
             requests.execute(data, url, method);
         } else {
-            Toast.makeText(activity.getApplicationContext(), s, Toast.LENGTH_SHORT).show();
+            Toast.makeText(activity.getApplicationContext(), result.getMessage(), Toast.LENGTH_SHORT).show();
         }
     }
 

@@ -35,7 +35,7 @@ public class PrenotazioniFragment extends Fragment {
         requests.execute(data, url, method);
 
         requests = new Requests(getActivity(), "oldUserBookings", root);
-        data = "action=oldUserBookings&isAndroid=true";
+        data = "action=oldUserBookings";
         url = "http://10.0.2.2:8080/ProgettoTWEB_war_exploded/Controller";
         method = "GET";
         requests.execute(data, url, method);
