@@ -27,7 +27,7 @@
             android:id="@+id/cardsContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:visibility="gone" >
+            android:visibility="gone">
 
         </androidx.recyclerview.widget.RecyclerView>
 
@@ -35,8 +35,8 @@
             android:id="@+id/noLessons"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Non ci sono lezioni."
             android:layout_gravity="center"
+            android:text="Non ci sono lezioni."
             android:visibility="gone" />
 
         <RelativeLayout

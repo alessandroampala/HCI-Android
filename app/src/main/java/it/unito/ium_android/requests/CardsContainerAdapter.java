@@ -1,6 +1,7 @@
 package it.unito.ium_android.requests;
 
 import android.app.Activity;
+import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -49,7 +50,9 @@ public class CardsContainerAdapter extends RecyclerView.Adapter<CardsContainerAd
         holder.prenota.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Navigation.findNavController(activity, R.id.nav_host_fragment).navigate(R.id.nav_booking);
+                Bundle bundle = new Bundle();
+                bundle.putSerializable("lesson", lesson);
+                Navigation.findNavController(activity, R.id.nav_host_fragment).navigate(R.id.nav_booking, bundle);
             }
         });
     }

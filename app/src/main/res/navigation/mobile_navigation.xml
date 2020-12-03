@@ -26,6 +26,6 @@
     <fragment
         android:id="@+id/nav_booking"
         android:name="it.unito.ium_android.ui.booking.BookingFragment"
-        android:label="Prenota Una Lezione"
+        android:label="Lezioni"
         tools:layout="@layout/fragment_booking" />
 </navigation>

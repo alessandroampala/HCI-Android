@@ -1,6 +1,8 @@
 package it.unito.ium_android.requests;
 
-public class Lesson {
+import java.io.Serializable;
+
+public class Lesson implements Serializable {
     private Teacher teacher;
     private Course course;
 

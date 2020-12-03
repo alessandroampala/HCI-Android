@@ -40,6 +40,30 @@ public class PrenotaFragment extends Fragment {
 
         RelativeLayout loadingLayout = (RelativeLayout) root.findViewById(R.id.loadingPanel);
 
+        Requests requests = new Requests(getActivity(), "docenti", root);
+
+        String data = "action=docenti";
+        String url = "http://10.0.2.2:8080/ProgettoTWEB_war_exploded/Controller";
+        String method = "GET";
+        requests.execute(data, url, method);
+
+        requests = new Requests(getActivity(), "materie", root);
+
+        data = "action=materie";
+        url = "http://10.0.2.2:8080/ProgettoTWEB_war_exploded/Controller";
+        method = "GET";
+        requests.execute(data, url, method);
+
+        requests = new Requests(getActivity(), "lessons", root);
+        try {
+            data = "course=" + URLEncoder.encode(materia, "UTF-8") + "&teacherId=" + URLEncoder.encode(docente, "UTF-8") + "&action=lessons";
+            url = "http://10.0.2.2:8080/ProgettoTWEB_war_exploded/Controller";
+            method = "POST";
+            requests.execute(data, url, method);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+
         Spinner spinnerDocenti = (Spinner) root.findViewById(R.id.seleziona_docente);
         Spinner spinnerMaterie = (Spinner) root.findViewById(R.id.seleziona_materia);
 
@@ -108,28 +132,5 @@ public class PrenotaFragment extends Fragment {
     public void onResume() {
         super.onResume();
         firstTimeSpinner = 0;
-        Requests requests = new Requests(getActivity(), "docenti", getView());
-
-        String data = "action=docenti";
-        String url = "http://10.0.2.2:8080/ProgettoTWEB_war_exploded/Controller";
-        String method = "GET";
-        requests.execute(data, url, method);
-
-        requests = new Requests(getActivity(), "materie", getView());
-
-        data = "action=materie";
-        url = "http://10.0.2.2:8080/ProgettoTWEB_war_exploded/Controller";
-        method = "GET";
-        requests.execute(data, url, method);
-
-        requests = new Requests(getActivity(), "lessons", getView());
-        try {
-            data = "course=" + URLEncoder.encode(materia, "UTF-8") + "&teacherId=" + URLEncoder.encode(docente, "UTF-8") + "&action=lessons";
-            url = "http://10.0.2.2:8080/ProgettoTWEB_war_exploded/Controller";
-            method = "POST";
-            requests.execute(data, url, method);
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
     }
 }

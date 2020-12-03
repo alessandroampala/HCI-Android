@@ -16,7 +16,20 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/colorPrimary"
-            app:popupTheme="@style/Theme.Ium_Android.PopupOverlay" />
+            app:popupTheme="@style/Theme.Ium_Android.PopupOverlay">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/bookButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:layout_marginRight="8dp"
+                android:backgroundTint="#fff"
+                android:drawableRight="@drawable/ic_baseline_calendar_today_24"
+                android:text="@string/prenota"
+                android:textColor="#6200ee"
+                android:visibility="gone" />
+        </androidx.appcompat.widget.Toolbar>
 
     </com.google.android.material.appbar.AppBarLayout>
 

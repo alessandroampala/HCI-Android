@@ -1,6 +1,9 @@
 package it.unito.ium_android.ui.booking;
 
+import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,33 +11,90 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.SortedList;
 
 import com.google.android.material.button.MaterialButton;
-import com.google.android.material.textfield.TextInputLayout;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import it.unito.ium_android.R;
 import it.unito.ium_android.requests.Booking;
+import it.unito.ium_android.requests.Lesson;
 import it.unito.ium_android.requests.Requests;
-import it.unito.ium_android.ui.login.LoginViewModel;
+import it.unito.ium_android.requests.User;
+import it.unito.ium_android.requests.jsonMessage;
 
 
 public class BookingFragment extends Fragment implements View.OnClickListener {
 
     private BookingViewModel bookingViewModel;
     private List<TextView> week = new ArrayList<>();
+    private List<Booking> userBookings = null, teacherBookings = null;
+    private Lesson lesson;
+    private List<Integer> recordBookings;
+    private Integer weekPosition = 0;
+    private MaterialButton bookBtn;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         bookingViewModel =
                 new ViewModelProvider(this).get(BookingViewModel.class);
         View root = inflater.inflate(R.layout.fragment_booking, container, false);
+
+        lesson = (Lesson) getArguments().getSerializable("lesson");
+        recordBookings = new ArrayList<>();
+
+        bookBtn = getActivity().findViewById(R.id.bookButton);
+        bookBtn.setVisibility(View.VISIBLE);
+
+        bookBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(recordBookings.isEmpty()){
+                    Toast.makeText(getContext(), "Prenotazioni non selezionate", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                Requests prenotaLezioni = new Requests(getActivity(), "prenotaLezioni");
+                try {
+                    String data = "course=" + URLEncoder.encode(lesson.getCourse().getName(), "UTF-8") + "&teacherId=" + URLEncoder.encode(String.valueOf(lesson.getTeacher().getId()), "UTF-8")+ "&lessonSlots=" + URLEncoder.encode(recordBookings.toString(), "UTF-8") + "&action=prenotaLezioni";
+                    String url = "http://10.0.2.2:8080/ProgettoTWEB_war_exploded/Controller";
+                    String method = "POST";
+                    prenotaLezioni.execute(data, url, method);
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                }
+
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            prenotaLezioni.get();
+                        } catch (ExecutionException e) {
+                            e.printStackTrace();
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+
+                        recordBookings.clear();
+                        root.findViewById(R.id.loadingPanel).setVisibility(View.VISIBLE);
+                        root.findViewById(R.id.hoursContainer).setVisibility(View.GONE);
+                        executeQuery(root);
+                    }
+                }).run();
+            }
+        });
+
+        executeQuery(root);
 
         addWeekBtn(root);
 
@@ -44,33 +104,270 @@ public class BookingFragment extends Fragment implements View.OnClickListener {
         return root;
     }
 
+    private void executeQuery(View root){
+        Requests prenotazioniDocenteRequests = new Requests(getActivity(), "prenotazioniDocente");
+        try {
+            String data = "course=" + URLEncoder.encode(lesson.getCourse().getName(), "UTF-8") + "&teacherId=" + URLEncoder.encode(String.valueOf(lesson.getTeacher().getId()), "UTF-8")+ "&teacherId=" + URLEncoder.encode(String.valueOf(lesson.getTeacher().getId()), "UTF-8") + "&action=teacherBooking";
+            String url = "http://10.0.2.2:8080/ProgettoTWEB_war_exploded/Controller";
+            String method = "GET";
+            prenotazioniDocenteRequests.execute(data, url, method);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+
+        Requests userBookingsRequests = new Requests(getActivity(), "userBookings");
+        String data = "action=userBooking&isAndroid=true";
+        String url = "http://10.0.2.2:8080/ProgettoTWEB_war_exploded/Controller";
+        String method = "GET";
+        userBookingsRequests.execute(data, url, method);
+
+        new Task(this, root).execute(prenotazioniDocenteRequests, userBookingsRequests);
+    }
+
     private void addWeekBtn(View root) {
         week.add(root.findViewById(R.id.lun));
         week.add(root.findViewById(R.id.mar));
         week.add(root.findViewById(R.id.mer));
         week.add(root.findViewById(R.id.gio));
         week.add(root.findViewById(R.id.ven));
+        week.add(root.findViewById(R.id.date15));
+        week.add(root.findViewById(R.id.date16));
+        week.add(root.findViewById(R.id.date17));
+        week.add(root.findViewById(R.id.date18));
+        week.add(root.findViewById(R.id.date19));
+    }
+
+    private static class Task extends AsyncTask<Requests, Void, Void> {
+        private BookingFragment bookingFragment;
+        private View view;
+
+        Task(BookingFragment bookingFragment, View view) {
+            this.view = view;
+            this.bookingFragment = bookingFragment;
+        }
+
+        @Override
+        protected Void doInBackground(Requests... requests) {
+            String s = "";
+            jsonMessage<List<Booking>> result;
+            List<Booking> userBookings = null, teacherBookings = null;
+            try {
+                s = requests[0].get();
+                result = new Gson().fromJson(s, new TypeToken<jsonMessage<List<Booking>>>() {
+                }.getType());
+                teacherBookings = result.getData();
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            try {
+                s = requests[1].get();
+                result = new Gson().fromJson(s, new TypeToken<jsonMessage<List<Booking>>>() {
+                }.getType());
+                userBookings = result.getData();
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            bookingFragment.setBookings(userBookings, teacherBookings);
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            view.findViewById(R.id.hoursContainer).setVisibility(View.VISIBLE);
+            view.findViewById(R.id.loadingPanel).setVisibility(View.GONE);
+            bookingFragment.onClick(view.findViewById(R.id.lun));
+        }
+    }
+
+    private void resetWeekColor(TextView v) {
+        for (int i = 0; i < 5; i++)
+            week.get(i).setTextColor(Color.GRAY);
+        v.setTextColor(0xFF3F51B5);
     }
 
     @Override
     public void onClick(View v) {
-
         switch (((TextView) v).getText().toString()) {
             case "Lun":
-                Toast.makeText(getContext(), ((TextView) v).getText().toString(), Toast.LENGTH_SHORT).show();
+                weekPosition = 0;
+                resetWeekColor((TextView) v);
+                updateBookings(0, 5);
                 break;
             case "Mar":
-                Toast.makeText(getContext(), ((TextView) v).getText().toString(), Toast.LENGTH_SHORT).show();
+                weekPosition = 5;
+                resetWeekColor((TextView) v);
+                updateBookings(5, 10);
                 break;
             case "Mer":
-                Toast.makeText(getContext(), ((TextView) v).getText().toString(), Toast.LENGTH_SHORT).show();
+                weekPosition = 10;
+                resetWeekColor((TextView) v);
+                updateBookings(10, 15);
                 break;
             case "Gio":
-                Toast.makeText(getContext(), ((TextView) v).getText().toString(), Toast.LENGTH_SHORT).show();
+                weekPosition = 15;
+                resetWeekColor((TextView) v);
+                updateBookings(15, 20);
                 break;
             case "Ven":
-                Toast.makeText(getContext(), ((TextView) v).getText().toString(), Toast.LENGTH_SHORT).show();
+                weekPosition = 20;
+                resetWeekColor((TextView) v);
+                updateBookings(20, 25);
+                break;
+            default:
+                markBooking((TextView) v);
                 break;
         }
+    }
+
+    private void markBooking(TextView textView) {
+        if (textView.getBackground().getConstantState().equals(getResources().getDrawable(R.drawable.green).getConstantState())) {
+            textView.setBackgroundResource(R.drawable.dark_green);
+            textView.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_baseline_check_24, 0, 0);
+            if(!recordBookings.contains(lessonSlot(textView)))
+                recordBookings.add(lessonSlot(textView));
+        } else if (textView.getBackground().getConstantState().equals(getResources().getDrawable(R.drawable.dark_green).getConstantState())) {
+            textView.setBackgroundResource(R.drawable.green);
+            textView.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
+            recordBookings.remove(lessonSlot(textView));
+        }
+
+    }
+
+    private void setBookings(List<Booking> userBookings, List<Booking> teacherBookings) {
+        this.userBookings = userBookings;
+        this.teacherBookings = teacherBookings;
+    }
+
+    private void updateBookings(int start, int end) {
+        if (userBookings == null && teacherBookings == null) {
+            return;
+        }
+        for (int i = 5; i < 10; i++) {
+            week.get(i).setBackgroundResource(R.drawable.green);
+            week.get(i).setOnClickListener(this);
+            week.get(i).setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
+        }
+
+        for (Integer booking : recordBookings) {
+            if (booking >= start && booking < end)
+                switch (booking % 5) {
+                    case 0:
+                        markBooking(week.get(5));
+                        break;
+                    case 1:
+                        markBooking(week.get(6));
+                        break;
+                    case 2:
+                        markBooking(week.get(7));
+                        break;
+                    case 3:
+                        markBooking(week.get(8));
+                        break;
+                    case 4:
+                        markBooking(week.get(9));
+                        break;
+                }
+        }
+
+        for (Booking booking : teacherBookings) {
+            if (booking.getLessonSlot() >= start && booking.getLessonSlot() < end)
+                switch (booking.getLessonSlot() % 5) {
+                    case 0:
+                        week.get(5).setBackgroundResource(R.drawable.red);
+                        week.get(5).setOnClickListener(null);
+                        break;
+                    case 1:
+                        week.get(6).setBackgroundResource(R.drawable.red);
+                        week.get(6).setOnClickListener(null);
+                        break;
+                    case 2:
+                        week.get(7).setBackgroundResource(R.drawable.red);
+                        week.get(7).setOnClickListener(null);
+                        break;
+                    case 3:
+                        week.get(8).setBackgroundResource(R.drawable.red);
+                        week.get(8).setOnClickListener(null);
+                        break;
+                    case 4:
+                        week.get(9).setBackgroundResource(R.drawable.red);
+                        week.get(9).setOnClickListener(null);
+                        break;
+                }
+        }
+
+        for (Booking booking : userBookings) {
+            if (booking.getLessonSlot() >= start && booking.getLessonSlot() < end)
+                switch (booking.getLessonSlot() % 5) {
+                    case 0:
+                        if (booking.getCourse().equals(lesson.getCourse().getName()) && week.get(5).getBackground().getConstantState().equals(getResources().getDrawable(R.drawable.red).getConstantState()))
+                            week.get(5).setBackgroundResource(R.drawable.blue);
+                        else
+                            week.get(5).setBackgroundResource(R.drawable.red);
+                        week.get(5).setOnClickListener(null);
+                        week.get(5).setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_baseline_check_box_24, 0, 0);
+                        break;
+                    case 1:
+                        if (booking.getCourse().equals(lesson.getCourse().getName()) && week.get(6).getBackground().getConstantState().equals(getResources().getDrawable(R.drawable.red).getConstantState()))
+                            week.get(6).setBackgroundResource(R.drawable.blue);
+                        else
+                            week.get(6).setBackgroundResource(R.drawable.red);
+                        week.get(6).setOnClickListener(null);
+                        week.get(6).setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_baseline_check_box_24, 0, 0);
+                        break;
+                    case 2:
+                        if (booking.getCourse().equals(lesson.getCourse().getName()) && week.get(7).getBackground().getConstantState().equals(getResources().getDrawable(R.drawable.red).getConstantState()))
+                            week.get(7).setBackgroundResource(R.drawable.blue);
+                        else
+                            week.get(7).setBackgroundResource(R.drawable.red);
+                        week.get(7).setOnClickListener(null);
+                        week.get(7).setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_baseline_check_box_24, 0, 0);
+                        break;
+                    case 3:
+                        if (booking.getCourse().equals(lesson.getCourse().getName()) && week.get(8).getBackground().getConstantState().equals(getResources().getDrawable(R.drawable.red).getConstantState()))
+                            week.get(8).setBackgroundResource(R.drawable.blue);
+                        else
+                            week.get(8).setBackgroundResource(R.drawable.red);
+                        week.get(8).setOnClickListener(null);
+                        week.get(8).setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_baseline_check_box_24, 0, 0);
+                        break;
+                    case 4:
+                        if (booking.getCourse().equals(lesson.getCourse().getName()) && week.get(9).getBackground().getConstantState().equals(getResources().getDrawable(R.drawable.red).getConstantState()))
+                            week.get(9).setBackgroundResource(R.drawable.blue);
+                        else
+                            week.get(9).setBackgroundResource(R.drawable.red);
+                        week.get(9).setOnClickListener(null);
+                        week.get(9).setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_baseline_check_box_24, 0, 0);
+                        break;
+                }
+        }
+    }
+
+    private Integer lessonSlot(TextView v) {
+        switch (v.getText().toString()) {
+            case "15-16":
+                return weekPosition;
+            case "16-17":
+                return weekPosition + 1;
+            case "17-18":
+                return weekPosition + 2;
+            case "18-19":
+                return weekPosition + 3;
+            case "19-20":
+                return weekPosition + 4;
+            default:
+                return -1;
+        }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        bookBtn.setOnClickListener(null);
+        getActivity().findViewById(R.id.bookButton).setVisibility(View.GONE);
     }
 }
