@@ -3,6 +3,7 @@ package it.unito.ium_android.ui.prenotazioni;
 import android.app.Activity;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +19,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.ConcatAdapter;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -44,7 +46,23 @@ public class PrenotazioniFragment extends Fragment {
         prenotazioniViewModel =
                 new ViewModelProvider(this).get(PrenotazioniViewModel.class);
         View root = inflater.inflate(R.layout.fragment_prenotazioni, container, false);
+        SwipeRefreshLayout refreshPanel = root.findViewById(R.id.refreshPanel);
 
+        makeRequests(root);
+
+        refreshPanel.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                makeRequests(root);
+                refreshPanel.setRefreshing(false);
+            }
+        });
+
+
+        return root;
+    }
+
+    private void makeRequests(View root) {
         Requests userBookingsRequests = new Requests(getActivity(), "getUserBookings", root);
         String data = "action=userBooking&isAndroid=true";
         String url = "http://10.0.2.2:8080/ProgettoTWEB_war_exploded/Controller";
@@ -58,8 +76,6 @@ public class PrenotazioniFragment extends Fragment {
         oldUserBookingsRequests.execute(data, url, method);
 
         new Task(root, getActivity()).execute(userBookingsRequests, oldUserBookingsRequests);
-
-        return root;
     }
 
     public static class Task extends AsyncTask<Requests, Void, jsonMessage<List<Booking>>[]> {

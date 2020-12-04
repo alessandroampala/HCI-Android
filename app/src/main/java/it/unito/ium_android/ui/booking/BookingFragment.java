@@ -46,7 +46,6 @@ public class BookingFragment extends Fragment implements View.OnClickListener {
     private List<Integer> recordBookings;
     private Integer weekPosition = 0;
     private MaterialButton bookBtn;
-    private TextView username;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -381,4 +380,6 @@ public class BookingFragment extends Fragment implements View.OnClickListener {
             bookBtn.setVisibility(View.GONE);
         }
     }
+
+    
 }
