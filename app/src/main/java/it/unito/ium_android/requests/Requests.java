@@ -30,6 +30,7 @@ import java.util.List;
 
 import it.unito.ium_android.MainActivity;
 import it.unito.ium_android.R;
+import it.unito.ium_android.ui.prenotazioni.PrenotazioniFragment;
 
 public class Requests extends AsyncTask<String, String, String> {
     private Activity activity;
@@ -135,12 +136,6 @@ public class Requests extends AsyncTask<String, String, String> {
             case "materie":
                 materie(s);
                 break;
-            case "getUserBookings":
-                lessonsArchive(s);
-                break;
-            case "oldUserBookings":
-                oldLessonsArchive(s);
-                break;
             case "disdici":
                 disdici(s);
                 break;
@@ -162,7 +157,7 @@ public class Requests extends AsyncTask<String, String, String> {
         }.getType());
         NavigationView navigationView = activity.findViewById(R.id.nav_view);
         TextView username = navigationView.findViewById(R.id.usernameTextView);
-        if (result.getMessage().equals("Ok")) {
+        if (result.getMessage().equals("OK")) {
             Toast.makeText(activity.getApplicationContext(), "login fatto", Toast.LENGTH_SHORT).show();
             navigationView.getMenu().findItem(R.id.nav_login).setVisible(false);
             navigationView.getMenu().findItem(R.id.nav_logout).setVisible(true);
@@ -170,12 +165,14 @@ public class Requests extends AsyncTask<String, String, String> {
             navigationView.getMenu().getItem(0).setChecked(true);
             Navigation.findNavController(activity, R.id.nav_host_fragment).navigate(R.id.nav_prenota);
             username.setText(result.getData().getUsername());
+            ((MainActivity) activity).setLoggedIn(true);
         } else {
             Toast.makeText(activity.getApplicationContext(), result.getMessage(), Toast.LENGTH_SHORT).show();
             navigationView.getMenu().findItem(R.id.nav_login).setVisible(true);
             navigationView.getMenu().findItem(R.id.nav_logout).setVisible(false);
             navigationView.getMenu().findItem(R.id.nav_prenotazioni).setVisible(false);
             username.setText("Ospite");
+            ((MainActivity) activity).setLoggedIn(false);
         }
     }
 
@@ -192,11 +189,13 @@ public class Requests extends AsyncTask<String, String, String> {
             navigationView.getMenu().findItem(R.id.nav_prenotazioni).setVisible(true);
             navigationView.getMenu().getItem(0).setChecked(true);
             username.setText(result.getData().getUsername());
+            ((MainActivity) activity).setLoggedIn(true);
         } else {
             Toast.makeText(activity.getApplicationContext(), result.getMessage(), Toast.LENGTH_SHORT).show();
             navigationView.getMenu().findItem(R.id.nav_login).setVisible(true);
             navigationView.getMenu().findItem(R.id.nav_logout).setVisible(false);
             navigationView.getMenu().findItem(R.id.nav_prenotazioni).setVisible(false);
+            ((MainActivity) activity).setLoggedIn(false);
         }
     }
 
@@ -208,7 +207,13 @@ public class Requests extends AsyncTask<String, String, String> {
         RecyclerView cardsContainer = (RecyclerView) this.view.findViewById(R.id.cardsContainer);
         TextView noLessons = (TextView) this.view.findViewById(R.id.noLessons);
 
-        if (result.getMessage().equals("Ok")) {
+        if (result.getMessage().equals("OK")) {
+            if (result.getData().isEmpty()) {
+                loadingLayout.setVisibility(view.GONE);
+                cardsContainer.setVisibility(view.GONE);
+                noLessons.setVisibility(view.VISIBLE);
+                return;
+            }
             Spinner spinnerDocenti = (Spinner) this.view.findViewById(R.id.seleziona_docente);
             Spinner spinnerMaterie = (Spinner) this.view.findViewById(R.id.seleziona_materia);
             if (spinnerDocenti.getVisibility() == view.VISIBLE && spinnerMaterie.getVisibility() == view.VISIBLE && loadingLayout.getVisibility() == view.VISIBLE)
@@ -232,10 +237,15 @@ public class Requests extends AsyncTask<String, String, String> {
         jsonMessage<List<Teacher>> result = new Gson().fromJson(s, new TypeToken<jsonMessage<List<Teacher>>>() {
         }.getType());
 
-        if (result.getMessage().equals("Ok")) {
+        if (result.getMessage().equals("OK")) {
             RecyclerView cardsContainer = (RecyclerView) this.view.findViewById(R.id.cardsContainer);
             Spinner spinnerDocenti = (Spinner) this.view.findViewById(R.id.seleziona_docente);
             Spinner spinnerMaterie = (Spinner) this.view.findViewById(R.id.seleziona_materia);
+            if (result.getData().size() <= 1) {
+                spinnerDocenti.setVisibility(view.GONE);
+                spinnerMaterie.setVisibility(view.GONE);
+                return;
+            }
             RelativeLayout loadingLayout = (RelativeLayout) this.view.findViewById(R.id.loadingPanel);
             if (cardsContainer.getVisibility() == view.VISIBLE && spinnerMaterie.getVisibility() == view.VISIBLE)
                 loadingLayout.setVisibility(view.GONE);
@@ -250,10 +260,15 @@ public class Requests extends AsyncTask<String, String, String> {
     private void materie(String s) {
         jsonMessage<List<Course>> result = new Gson().fromJson(s, new TypeToken<jsonMessage<List<Course>>>() {
         }.getType());
-        if (result.getMessage().equals("Ok")) {
+        if (result.getMessage().equals("OK")) {
             RecyclerView cardsContainer = (RecyclerView) this.view.findViewById(R.id.cardsContainer);
             Spinner spinnerDocenti = (Spinner) this.view.findViewById(R.id.seleziona_docente);
             Spinner spinnerMaterie = (Spinner) this.view.findViewById(R.id.seleziona_materia);
+            if (result.getData().size() <= 1) {
+                spinnerDocenti.setVisibility(view.GONE);
+                spinnerMaterie.setVisibility(view.GONE);
+                return;
+            }
             RelativeLayout loadingLayout = (RelativeLayout) this.view.findViewById(R.id.loadingPanel);
             if (cardsContainer.getVisibility() == view.VISIBLE && spinnerDocenti.getVisibility() == view.VISIBLE)
                 loadingLayout.setVisibility(view.GONE);
@@ -265,67 +280,23 @@ public class Requests extends AsyncTask<String, String, String> {
         }
     }
 
-    private void lessonsArchive(String s) {
-        jsonMessage<List<Booking>> result = new Gson().fromJson(s, new TypeToken<jsonMessage<List<Booking>>>() {
-        }.getType());
-
-        RelativeLayout loadingLayout = (RelativeLayout) this.view.findViewById(R.id.loadingPanel);
-        TextView noBooking = (TextView) this.view.findViewById(R.id.noBooking);
-        RecyclerView cardsContainer = (RecyclerView) this.view.findViewById(R.id.cardsContainer);
-
-        if (result.getMessage().equals("Ok")) {
-            Collections.sort(result.getData());
-            loadingLayout.setVisibility(view.GONE);
-            cardsContainer.setVisibility(view.VISIBLE);
-            cardsContainer.setHasFixedSize(true);
-            cardsContainer.setLayoutManager(new LinearLayoutManager(this.activity.getApplicationContext(), LinearLayoutManager.VERTICAL, false));
-            RecyclerView.Adapter cardsContainerAdapter = new CardsArchiveContainerAdapter(result.getData());
-            cardsContainer.setAdapter(cardsContainerAdapter);
-        } else {
-            Toast.makeText(activity.getApplicationContext(), result.getMessage(), Toast.LENGTH_SHORT).show();
-            loadingLayout.setVisibility(view.GONE);
-            cardsContainer.setVisibility(view.GONE);
-            noBooking.setVisibility(view.VISIBLE);
-        }
-    }
-
-    private void oldLessonsArchive(String s) {
-        jsonMessage<List<Booking>> result = new Gson().fromJson(s, new TypeToken<jsonMessage<List<Booking>>>() {
-        }.getType());
-
-        RelativeLayout loadingLayout = (RelativeLayout) this.view.findViewById(R.id.loadingPanel);
-        RecyclerView oldCardsContainer = (RecyclerView) this.view.findViewById(R.id.oldCardsContainer);
-
-        if (result.getMessage().equals("Ok")) {
-            Collections.sort(result.getData());
-            loadingLayout.setVisibility(view.GONE);
-            oldCardsContainer.setVisibility(view.VISIBLE);
-            oldCardsContainer.setHasFixedSize(true);
-            oldCardsContainer.setLayoutManager(new LinearLayoutManager(this.activity.getApplicationContext(), LinearLayoutManager.VERTICAL, false));
-            RecyclerView.Adapter oldCardsContainerAdapter = new CardsArchiveContainerAdapter(result.getData());
-            oldCardsContainer.setAdapter(oldCardsContainerAdapter);
-        } else {
-            Toast.makeText(activity.getApplicationContext(), result.getMessage(), Toast.LENGTH_SHORT).show();
-            loadingLayout.setVisibility(view.GONE);
-            oldCardsContainer.setVisibility(view.GONE);
-        }
-    }
-
     private void disdici(String s) {
         jsonMessage<List<Object>> result = new Gson().fromJson(s, new TypeToken<jsonMessage<List<Object>>>() {
         }.getType());
         if (result.getMessage().equals("OK")) {
-            Requests requests = new Requests(activity, "getUserBookings", view);
+            Requests userBookingsRequests = new Requests(activity, "getUserBookings", view);
             String data = "action=userBooking&isAndroid=true";
             String url = "http://10.0.2.2:8080/ProgettoTWEB_war_exploded/Controller";
             String method = "GET";
-            requests.execute(data, url, method);
+            userBookingsRequests.execute(data, url, method);
 
-            requests = new Requests(activity, "oldUserBookings", view);
+            Requests oldUserBookingsRequests = new Requests(activity, "oldUserBookings", view);
             data = "action=oldUserBookings";
             url = "http://10.0.2.2:8080/ProgettoTWEB_war_exploded/Controller";
             method = "GET";
-            requests.execute(data, url, method);
+            oldUserBookingsRequests.execute(data, url, method);
+
+            new PrenotazioniFragment.Task(view, activity).execute(userBookingsRequests, oldUserBookingsRequests);
         } else {
             Toast.makeText(activity.getApplicationContext(), result.getMessage(), Toast.LENGTH_SHORT).show();
         }
@@ -335,17 +306,19 @@ public class Requests extends AsyncTask<String, String, String> {
         jsonMessage<List<Object>> result = new Gson().fromJson(s, new TypeToken<jsonMessage<List<Object>>>() {
         }.getType());
         if (result.getMessage().equals("OK")) {
-            Requests requests = new Requests(activity, "getUserBookings", view);
+            Requests userBookingsRequests = new Requests(activity, "getUserBookings", view);
             String data = "action=userBooking&isAndroid=true";
             String url = "http://10.0.2.2:8080/ProgettoTWEB_war_exploded/Controller";
             String method = "GET";
-            requests.execute(data, url, method);
+            userBookingsRequests.execute(data, url, method);
 
-            requests = new Requests(activity, "oldUserBookings", view);
+            Requests oldUserBookingsRequests = new Requests(activity, "oldUserBookings", view);
             data = "action=oldUserBookings";
             url = "http://10.0.2.2:8080/ProgettoTWEB_war_exploded/Controller";
             method = "GET";
-            requests.execute(data, url, method);
+            oldUserBookingsRequests.execute(data, url, method);
+
+            new PrenotazioniFragment.Task(view, activity).execute(userBookingsRequests, oldUserBookingsRequests);
         } else {
             Toast.makeText(activity.getApplicationContext(), result.getMessage(), Toast.LENGTH_SHORT).show();
         }
@@ -371,5 +344,6 @@ public class Requests extends AsyncTask<String, String, String> {
         navigationView.getMenu().findItem(R.id.nav_logout).setVisible(false);
         navigationView.getMenu().findItem(R.id.nav_prenotazioni).setVisible(false);
         username.setText("Ospite");
+        ((MainActivity) activity).setLoggedIn(false);
     }
 }

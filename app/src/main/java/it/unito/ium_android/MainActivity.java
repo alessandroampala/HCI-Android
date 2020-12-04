@@ -36,6 +36,7 @@ import it.unito.ium_android.requests.Requests;
 public class MainActivity extends AppCompatActivity{
 
     private AppBarConfiguration mAppBarConfiguration;
+    private boolean loggedIn=false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,5 +98,13 @@ public class MainActivity extends AppCompatActivity{
         String url = "http://10.0.2.2:8080/ProgettoTWEB_war_exploded/Controller";
         String method = "POST";
         requests.execute(data, url, method);
+    }
+
+    public void setLoggedIn(boolean loggedIn) {
+        this.loggedIn = loggedIn;
+    }
+
+    public boolean isLoggedIn() {
+        return loggedIn;
     }
 }
