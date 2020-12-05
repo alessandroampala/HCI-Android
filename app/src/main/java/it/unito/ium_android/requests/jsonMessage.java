@@ -1,8 +1,8 @@
 package it.unito.ium_android.requests;
 
 public class jsonMessage<T> {
-    private String message;
-    private T data;
+    private final String message;
+    private final T data;
 
     public jsonMessage(String message, T data) {
         this.message = message;

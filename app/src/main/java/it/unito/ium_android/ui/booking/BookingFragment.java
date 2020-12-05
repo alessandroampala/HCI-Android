@@ -1,9 +1,9 @@
 package it.unito.ium_android.ui.booking;
 
+import android.annotation.SuppressLint;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,14 +11,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProvider;
-import androidx.recyclerview.widget.SortedList;
 
 import com.google.android.material.button.MaterialButton;
-import com.google.android.material.navigation.NavigationView;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -33,14 +28,12 @@ import it.unito.ium_android.R;
 import it.unito.ium_android.requests.Booking;
 import it.unito.ium_android.requests.Lesson;
 import it.unito.ium_android.requests.Requests;
-import it.unito.ium_android.requests.User;
 import it.unito.ium_android.requests.jsonMessage;
 
-
+@SuppressLint("StaticFieldLeak")
 public class BookingFragment extends Fragment implements View.OnClickListener {
 
-    private BookingViewModel bookingViewModel;
-    private List<TextView> week = new ArrayList<>();
+    private final List<TextView> week = new ArrayList<>();
     private List<Booking> userBookings = null, teacherBookings = null;
     private Lesson lesson;
     private List<Integer> recordBookings;
@@ -49,52 +42,50 @@ public class BookingFragment extends Fragment implements View.OnClickListener {
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        bookingViewModel =
-                new ViewModelProvider(this).get(BookingViewModel.class);
         View root = inflater.inflate(R.layout.fragment_booking, container, false);
 
         lesson = (Lesson) getArguments().getSerializable("lesson");
         recordBookings = new ArrayList<>();
 
-        if (((MainActivity) getActivity()).isLoggedIn()) {
-            bookBtn = getActivity().findViewById(R.id.bookButton);
+        if (((MainActivity) requireActivity()).isLoggedIn()) {
+            bookBtn = requireActivity().findViewById(R.id.bookButton);
             bookBtn.setVisibility(View.VISIBLE);
 
-            bookBtn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (recordBookings.isEmpty()) {
-                        Toast.makeText(getActivity().getBaseContext(), "Prenotazioni non selezionate", Toast.LENGTH_SHORT).show();
-                        return;
-                    }
-                    Requests prenotaLezioni = new Requests(getActivity(), "prenotaLezioni");
-                    try {
-                        String data = "course=" + URLEncoder.encode(lesson.getCourse().getName(), "UTF-8") + "&teacherId=" + URLEncoder.encode(String.valueOf(lesson.getTeacher().getId()), "UTF-8") + "&lessonSlots=" + URLEncoder.encode(recordBookings.toString(), "UTF-8") + "&action=prenotaLezioni";
-                        String url = "http://10.0.2.2:8080/ProgettoTWEB_war_exploded/Controller";
-                        String method = "POST";
-                        prenotaLezioni.execute(data, url, method);
-                    } catch (UnsupportedEncodingException e) {
-                        e.printStackTrace();
-                    }
-
-                    new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            try {
-                                prenotaLezioni.get();
-                            } catch (ExecutionException e) {
-                                e.printStackTrace();
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
-                            }
-
-                            recordBookings.clear();
-                            root.findViewById(R.id.loadingPanel).setVisibility(View.VISIBLE);
-                            root.findViewById(R.id.hoursContainer).setVisibility(View.GONE);
-                            executeQuery(root);
-                        }
-                    }).run();
+            bookBtn.setOnClickListener(v -> {
+                if (recordBookings.isEmpty()) {
+                    Toast.makeText(requireActivity().getBaseContext(), "Prenotazioni non selezionate", Toast.LENGTH_SHORT).show();
+                    return;
                 }
+                Requests prenotaLezioni = new Requests(getActivity(), "prenotaLezioni");
+                try {
+                    String data = "course=" + URLEncoder.encode(lesson.getCourse().getName(), "UTF-8") + "&teacherId=" + URLEncoder.encode(String.valueOf(lesson.getTeacher().getId()), "UTF-8") + "&lessonSlots=" + URLEncoder.encode(recordBookings.toString(), "UTF-8") + "&action=prenotaLezioni";
+                    String url = "http://10.0.2.2:8080/ProgettoTWEB_war_exploded/Controller";
+                    String method = "POST";
+                    prenotaLezioni.execute(data, url, method);
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                }
+
+                new AsyncTask<Void, Void, Void>() {
+                    @Override
+                    protected Void doInBackground(Void... voids) {
+                        try {
+                            prenotaLezioni.get();
+                        } catch (ExecutionException | InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                        recordBookings.clear();
+                        executeQuery(root);
+                        return null;
+                    }
+
+                    @Override
+                    protected void onPostExecute(Void aVoid) {
+                        super.onPostExecute(aVoid);
+                        root.findViewById(R.id.loadingPanel).setVisibility(View.VISIBLE);
+                        root.findViewById(R.id.hoursContainer).setVisibility(View.GONE);
+                    }
+                }.execute();
             });
         }
 
@@ -143,8 +134,8 @@ public class BookingFragment extends Fragment implements View.OnClickListener {
     }
 
     private static class Task extends AsyncTask<Requests, Void, Void> {
-        private BookingFragment bookingFragment;
-        private View view;
+        private final BookingFragment bookingFragment;
+        private final View view;
 
         Task(BookingFragment bookingFragment, View view) {
             this.view = view;
@@ -153,7 +144,7 @@ public class BookingFragment extends Fragment implements View.OnClickListener {
 
         @Override
         protected Void doInBackground(Requests... requests) {
-            String s = "";
+            String s;
             jsonMessage<List<Booking>> result;
             List<Booking> userBookings = null, teacherBookings = null;
             try {
@@ -161,9 +152,7 @@ public class BookingFragment extends Fragment implements View.OnClickListener {
                 result = new Gson().fromJson(s, new TypeToken<jsonMessage<List<Booking>>>() {
                 }.getType());
                 teacherBookings = result.getData();
-            } catch (ExecutionException e) {
-                e.printStackTrace();
-            } catch (InterruptedException e) {
+            } catch (ExecutionException | InterruptedException e) {
                 e.printStackTrace();
             }
             try {
@@ -171,9 +160,7 @@ public class BookingFragment extends Fragment implements View.OnClickListener {
                 result = new Gson().fromJson(s, new TypeToken<jsonMessage<List<Booking>>>() {
                 }.getType());
                 userBookings = result.getData();
-            } catch (ExecutionException e) {
-                e.printStackTrace();
-            } catch (InterruptedException e) {
+            } catch (ExecutionException | InterruptedException e) {
                 e.printStackTrace();
             }
             bookingFragment.setBookings(userBookings, teacherBookings);
@@ -252,7 +239,7 @@ public class BookingFragment extends Fragment implements View.OnClickListener {
     private void updateBookings(int start, int end) {
         for (int i = 5; i < 10; i++) {
             week.get(i).setBackgroundResource(R.drawable.green);
-            if (((MainActivity) getActivity()).isLoggedIn())
+            if (((MainActivity) requireActivity()).isLoggedIn())
                 week.get(i).setOnClickListener(this);
             week.get(i).setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
         }
@@ -375,11 +362,11 @@ public class BookingFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if (((MainActivity) getActivity()).isLoggedIn()) {
+        if (((MainActivity) requireActivity()).isLoggedIn()) {
             bookBtn.setOnClickListener(null);
             bookBtn.setVisibility(View.GONE);
         }
     }
 
-    
+
 }

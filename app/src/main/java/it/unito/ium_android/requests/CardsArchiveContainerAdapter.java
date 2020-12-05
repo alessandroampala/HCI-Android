@@ -20,7 +20,7 @@ import it.unito.ium_android.R;
 
 public class CardsArchiveContainerAdapter extends RecyclerView.Adapter<CardsArchiveContainerAdapter.CardsContainerViewHolder> {
 
-    private List<Booking> data;
+    private final List<Booking> data;
 
     public CardsArchiveContainerAdapter(List<Booking> data) {
         this.data = data;
@@ -30,8 +30,7 @@ public class CardsArchiveContainerAdapter extends RecyclerView.Adapter<CardsArch
     @Override
     public CardsArchiveContainerAdapter.CardsContainerViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.card_archive_design, parent, false);
-        CardsArchiveContainerAdapter.CardsContainerViewHolder cardsContainerViewHolder = new CardsArchiveContainerAdapter.CardsContainerViewHolder(view);
-        return cardsContainerViewHolder;
+        return new CardsContainerViewHolder(view);
     }
 
     @Override
@@ -39,36 +38,30 @@ public class CardsArchiveContainerAdapter extends RecyclerView.Adapter<CardsArch
         Booking booking = this.data.get(position);
 
         holder.materia.setText(booking.getCourse());
-        holder.docente.setText(booking.getTeacher().getName() + " " + booking.getTeacher().getSurname());
+        holder.docente.setText(String.format("%s %s", booking.getTeacher().getName(), booking.getTeacher().getSurname()));
         holder.data.setText(lessonSlotToString(booking.getLessonSlot()));
         if (String.valueOf(booking.status).equals("ACTIVE")) {
             holder.buttons.setVisibility(View.VISIBLE);
-            holder.disdici.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Requests requests = new Requests((Activity) v.getContext(), "disdici", v.getRootView());
-                    try {
-                        String data = "lessonSlot=" + URLEncoder.encode(String.valueOf(booking.getLessonSlot()), "UTF-8") + "&course=" + URLEncoder.encode(booking.getCourse(), "UTF-8") + "&teacherId=" + URLEncoder.encode(String.valueOf(booking.getTeacher().getId()), "UTF-8") + "&action=disdici";
-                        String url = "http://10.0.2.2:8080/ProgettoTWEB_war_exploded/Controller";
-                        String method = "POST";
-                        requests.execute(data, url, method);
-                    } catch (UnsupportedEncodingException e) {
-                        e.printStackTrace();
-                    }
+            holder.disdici.setOnClickListener(v -> {
+                Requests requests = new Requests((Activity) v.getContext(), "disdici", v.getRootView());
+                try {
+                    String data = "lessonSlot=" + URLEncoder.encode(String.valueOf(booking.getLessonSlot()), "UTF-8") + "&course=" + URLEncoder.encode(booking.getCourse(), "UTF-8") + "&teacherId=" + URLEncoder.encode(String.valueOf(booking.getTeacher().getId()), "UTF-8") + "&action=disdici";
+                    String url = "http://10.0.2.2:8080/ProgettoTWEB_war_exploded/Controller";
+                    String method = "POST";
+                    requests.execute(data, url, method);
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
                 }
             });
-            holder.svolta.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Requests requests = new Requests((Activity) v.getContext(), "svolta", v.getRootView());
-                    try {
-                        String data = "lessonSlot=" + URLEncoder.encode(String.valueOf(booking.getLessonSlot()), "UTF-8") + "&course=" + URLEncoder.encode(booking.getCourse(), "UTF-8") + "&teacherId=" + URLEncoder.encode(String.valueOf(booking.getTeacher().getId()), "UTF-8") + "&action=effettuata";
-                        String url = "http://10.0.2.2:8080/ProgettoTWEB_war_exploded/Controller";
-                        String method = "POST";
-                        requests.execute(data, url, method);
-                    } catch (UnsupportedEncodingException e) {
-                        e.printStackTrace();
-                    }
+            holder.svolta.setOnClickListener(v -> {
+                Requests requests = new Requests((Activity) v.getContext(), "svolta", v.getRootView());
+                try {
+                    String data = "lessonSlot=" + URLEncoder.encode(String.valueOf(booking.getLessonSlot()), "UTF-8") + "&course=" + URLEncoder.encode(booking.getCourse(), "UTF-8") + "&teacherId=" + URLEncoder.encode(String.valueOf(booking.getTeacher().getId()), "UTF-8") + "&action=effettuata";
+                    String url = "http://10.0.2.2:8080/ProgettoTWEB_war_exploded/Controller";
+                    String method = "POST";
+                    requests.execute(data, url, method);
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
                 }
             });
         } else {

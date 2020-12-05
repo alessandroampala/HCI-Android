@@ -3,7 +3,6 @@ package it.unito.ium_android.ui.prenotazioni;
 import android.app.Activity;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,10 +11,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.ConcatAdapter;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -24,8 +20,6 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -35,27 +29,19 @@ import it.unito.ium_android.requests.Booking;
 import it.unito.ium_android.requests.CardsArchiveContainerAdapter;
 import it.unito.ium_android.requests.Requests;
 import it.unito.ium_android.requests.jsonMessage;
-import it.unito.ium_android.ui.booking.BookingFragment;
 
 public class PrenotazioniFragment extends Fragment {
 
-    private PrenotazioniViewModel prenotazioniViewModel;
-
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        prenotazioniViewModel =
-                new ViewModelProvider(this).get(PrenotazioniViewModel.class);
         View root = inflater.inflate(R.layout.fragment_prenotazioni, container, false);
         SwipeRefreshLayout refreshPanel = root.findViewById(R.id.refreshPanel);
 
         makeRequests(root);
 
-        refreshPanel.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                makeRequests(root);
-                refreshPanel.setRefreshing(false);
-            }
+        refreshPanel.setOnRefreshListener(() -> {
+            makeRequests(root);
+            refreshPanel.setRefreshing(false);
         });
 
 
@@ -79,8 +65,8 @@ public class PrenotazioniFragment extends Fragment {
     }
 
     public static class Task extends AsyncTask<Requests, Void, jsonMessage<List<Booking>>[]> {
-        private View view;
-        private Activity activity;
+        private final View view;
+        private final Activity activity;
 
         public Task(View view, Activity activity) {
             this.view = view;
@@ -89,16 +75,14 @@ public class PrenotazioniFragment extends Fragment {
 
         @Override
         protected jsonMessage<List<Booking>>[] doInBackground(Requests... requests) {
-            String s = "";
+            String s;
             jsonMessage<List<Booking>>[] result = new jsonMessage[2];
 
             try {
                 s = requests[0].get();
                 result[0] = new Gson().fromJson(s, new TypeToken<jsonMessage<List<Booking>>>() {
                 }.getType());
-            } catch (ExecutionException e) {
-                e.printStackTrace();
-            } catch (InterruptedException e) {
+            } catch (ExecutionException | InterruptedException e) {
                 e.printStackTrace();
             }
 
@@ -106,9 +90,7 @@ public class PrenotazioniFragment extends Fragment {
                 s = requests[1].get();
                 result[1] = new Gson().fromJson(s, new TypeToken<jsonMessage<List<Booking>>>() {
                 }.getType());
-            } catch (ExecutionException e) {
-                e.printStackTrace();
-            } catch (InterruptedException e) {
+            } catch (ExecutionException | InterruptedException e) {
                 e.printStackTrace();
             }
 
@@ -118,8 +100,8 @@ public class PrenotazioniFragment extends Fragment {
         @Override
         protected void onPostExecute(jsonMessage<List<Booking>>[] result) {
             super.onPostExecute(result);
-            RelativeLayout loadingLayout = (RelativeLayout) this.view.findViewById(R.id.loadingPanel);
-            RecyclerView cardsContainer = (RecyclerView) this.view.findViewById(R.id.cardsContainer);
+            RelativeLayout loadingLayout = this.view.findViewById(R.id.loadingPanel);
+            RecyclerView cardsContainer = this.view.findViewById(R.id.cardsContainer);
             ConcatAdapter concatAdapter = new ConcatAdapter();
 
             if (result[0].getMessage().equals("OK"))
@@ -131,19 +113,19 @@ public class PrenotazioniFragment extends Fragment {
                 oldLessonsArchive(result[1].getData(), concatAdapter);
             else {
                 Toast.makeText(activity.getBaseContext(), result[1].getMessage(), Toast.LENGTH_SHORT).show();
-                loadingLayout.setVisibility(view.GONE);
+                loadingLayout.setVisibility(View.GONE);
             }
 
-            cardsContainer.setVisibility(view.VISIBLE);
+            cardsContainer.setVisibility(View.VISIBLE);
             cardsContainer.setHasFixedSize(true);
             cardsContainer.setLayoutManager(new LinearLayoutManager(this.activity.getApplicationContext(), LinearLayoutManager.VERTICAL, false));
             cardsContainer.setAdapter(concatAdapter);
         }
 
         private void lessonsArchive(List<Booking> userBookings, ConcatAdapter concatAdapter) {
-            TextView noBooking = (TextView) this.view.findViewById(R.id.noBooking);
+            TextView noBooking = this.view.findViewById(R.id.noBooking);
             if (userBookings.isEmpty()) {
-                noBooking.setVisibility(view.VISIBLE);
+                noBooking.setVisibility(View.VISIBLE);
                 return;
             }
             Collections.sort(userBookings);
@@ -152,13 +134,13 @@ public class PrenotazioniFragment extends Fragment {
         }
 
         private void oldLessonsArchive(List<Booking> oldUserBookings, ConcatAdapter concatAdapter) {
-            RelativeLayout loadingLayout = (RelativeLayout) this.view.findViewById(R.id.loadingPanel);
+            RelativeLayout loadingLayout = this.view.findViewById(R.id.loadingPanel);
             if (oldUserBookings.isEmpty()) {
-                loadingLayout.setVisibility(view.GONE);
+                loadingLayout.setVisibility(View.GONE);
                 return;
             }
             Collections.sort(oldUserBookings);
-            loadingLayout.setVisibility(view.GONE);
+            loadingLayout.setVisibility(View.GONE);
             RecyclerView.Adapter oldCardsContainerAdapter = new CardsArchiveContainerAdapter(oldUserBookings);
             concatAdapter.addAdapter(oldCardsContainerAdapter);
         }

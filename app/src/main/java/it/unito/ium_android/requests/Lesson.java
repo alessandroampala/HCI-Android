@@ -3,8 +3,8 @@ package it.unito.ium_android.requests;
 import java.io.Serializable;
 
 public class Lesson implements Serializable {
-    private Teacher teacher;
-    private Course course;
+    private final Teacher teacher;
+    private final Course course;
 
     public Lesson(Teacher teacher, Course course) {
         this.teacher = teacher;

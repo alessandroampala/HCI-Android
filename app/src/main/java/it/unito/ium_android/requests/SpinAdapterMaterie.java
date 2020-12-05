@@ -6,16 +6,16 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.List;
 
 
 public class SpinAdapterMaterie extends ArrayAdapter<Course> {
-    private Context context;
-    private List<Course> materie;
+    private final List<Course> materie;
 
     public SpinAdapterMaterie(Context context, int textViewResourceId, List<Course> materie) {
         super(context, textViewResourceId, materie);
-        this.context = context;
         this.materie = materie;
     }
 
@@ -43,7 +43,7 @@ public class SpinAdapterMaterie extends ArrayAdapter<Course> {
     }
 
     @Override
-    public View getDropDownView(int position, View convertView, ViewGroup parent) {
+    public View getDropDownView(int position, View convertView, @NotNull ViewGroup parent) {
         return getView(position, convertView, parent);
     }
 }

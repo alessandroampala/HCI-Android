@@ -6,7 +6,6 @@
     <string name="nome_cognome">Nome Cognome</string>
     <string name="username">Username</string>
     <string name="password">Password</string>
-    <string name="ospite">Ospite</string>
     <string name="logout">Logout</string>
     <string name="data">Data</string>
     <string name="disdici">Disdici</string>
@@ -18,4 +17,6 @@
     <string name="gio">Gio</string>
     <string name="ven">Ven</string>
     <string name="non_ci_sono_ripetizioni_attive">Non ci sono ripetizioni attive.</string>
+    <string name="ospite">Ospite</string>
+    <string name="non_ci_sono_lezioni">Non ci sono lezioni.</string>
 </resources>

@@ -1,18 +1,14 @@
 package it.unito.ium_android.requests;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.view.View;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.navigation.Navigation;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.navigation.NavigationView;
 import com.google.gson.Gson;
@@ -24,8 +20,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.ProtocolException;
+import java.net.SocketTimeoutException;
 import java.net.URL;
-import java.util.Collections;
 import java.util.List;
 
 import it.unito.ium_android.MainActivity;
@@ -33,9 +29,9 @@ import it.unito.ium_android.R;
 import it.unito.ium_android.ui.prenotazioni.PrenotazioniFragment;
 
 public class Requests extends AsyncTask<String, String, String> {
-    private Activity activity;
-    private String className;
-    private View view;
+    private final Activity activity;
+    private final String className;
+    private final View view;
 
     public Requests(Activity activity, String className) {
         this.activity = activity;
@@ -51,7 +47,7 @@ public class Requests extends AsyncTask<String, String, String> {
 
     @Override
     protected String doInBackground(String... strings) {
-        String concatStrings = "";
+        StringBuilder concatStrings = new StringBuilder();
 
         HttpURLConnection connection = null;
 
@@ -60,15 +56,19 @@ public class Requests extends AsyncTask<String, String, String> {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
         try {
             connection.setRequestMethod(strings[2]);
         } catch (ProtocolException e) {
             e.printStackTrace();
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+            return null;
         }
         connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded; utf-8");
         connection.setRequestProperty("Content-Length", String.valueOf(strings[0].length()));
         if (this.className.equals("getSessionLogin") || this.className.equals("getUserBookings") || this.className.equals("oldUserBookings") || this.className.equals("disdici") || this.className.equals("svolta") || this.className.equals("logout") || this.className.equals("prenotazioniDocente") || this.className.equals("userBookings") || this.className.equals("prenotaLezioni")) {
-            SharedPreferences sharedPref = this.activity.getPreferences(this.activity.MODE_PRIVATE);
+            SharedPreferences sharedPref = this.activity.getPreferences(Context.MODE_PRIVATE);
             String sessionId = "";
             if (sharedPref.contains("sessionId"))
                 sessionId = sharedPref.getString("sessionId", "");
@@ -77,7 +77,7 @@ public class Requests extends AsyncTask<String, String, String> {
         connection.setDoInput(true);
         connection.setDoOutput(true);
 
-        DataOutputStream out = null;
+        DataOutputStream out;
         try {
             out = new DataOutputStream(connection.getOutputStream());
             out.writeBytes(strings[0]);
@@ -89,17 +89,17 @@ public class Requests extends AsyncTask<String, String, String> {
                             connection.getInputStream()));
             String decodedString;
             while ((decodedString = in.readLine()) != null) {
-                concatStrings += decodedString;
+                concatStrings.append(decodedString);
             }
 
             if (this.className.equals("login")) {
                 String cookie = connection.getHeaderField("set-cookie");
-                SharedPreferences sharedPref = this.activity.getPreferences(this.activity.MODE_PRIVATE);
+                SharedPreferences sharedPref = this.activity.getPreferences(Context.MODE_PRIVATE);
                 SharedPreferences.Editor editor = sharedPref.edit();
                 editor.putString("sessionId", cookie.substring(0, cookie.indexOf(";")));
                 editor.apply();
             } else if (this.className.equals("logout")) {
-                SharedPreferences sharedPref = this.activity.getPreferences(this.activity.MODE_PRIVATE);
+                SharedPreferences sharedPref = this.activity.getPreferences(Context.MODE_PRIVATE);
                 SharedPreferences.Editor editor = sharedPref.edit();
                 editor.clear();
                 editor.apply();
@@ -109,16 +109,20 @@ public class Requests extends AsyncTask<String, String, String> {
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
-            if (connection != null)
-                connection.disconnect();
+            connection.disconnect();
         }
 
-        return concatStrings;
+        return concatStrings.toString();
     }
 
     @Override
     protected void onPostExecute(String s) {
         super.onPostExecute(s);
+
+        if (s == null) {
+            Toast.makeText(activity.getBaseContext(), "Connection error", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
         switch (this.className) {
             case "login":
@@ -137,7 +141,7 @@ public class Requests extends AsyncTask<String, String, String> {
                 prenotaLezioni(s);
                 break;
             case "logout":
-                logout(s);
+                logout();
                 break;
         }
 
@@ -149,7 +153,7 @@ public class Requests extends AsyncTask<String, String, String> {
         NavigationView navigationView = activity.findViewById(R.id.nav_view);
         TextView username = navigationView.findViewById(R.id.usernameTextView);
         if (result.getMessage().equals("OK")) {
-            Toast.makeText(activity.getApplicationContext(), "login fatto", Toast.LENGTH_SHORT).show();
+            Toast.makeText(activity.getBaseContext(), "login fatto", Toast.LENGTH_SHORT).show();
             navigationView.getMenu().findItem(R.id.nav_login).setVisible(false);
             navigationView.getMenu().findItem(R.id.nav_logout).setVisible(true);
             navigationView.getMenu().findItem(R.id.nav_prenotazioni).setVisible(true);
@@ -158,11 +162,11 @@ public class Requests extends AsyncTask<String, String, String> {
             username.setText(result.getData().getUsername());
             ((MainActivity) activity).setLoggedIn(true);
         } else {
-            Toast.makeText(activity.getApplicationContext(), result.getMessage(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(activity.getBaseContext(), result.getMessage(), Toast.LENGTH_SHORT).show();
             navigationView.getMenu().findItem(R.id.nav_login).setVisible(true);
             navigationView.getMenu().findItem(R.id.nav_logout).setVisible(false);
             navigationView.getMenu().findItem(R.id.nav_prenotazioni).setVisible(false);
-            username.setText("Ospite");
+            username.setText(R.string.ospite);
             ((MainActivity) activity).setLoggedIn(false);
         }
     }
@@ -208,7 +212,7 @@ public class Requests extends AsyncTask<String, String, String> {
 
             new PrenotazioniFragment.Task(view, activity).execute(userBookingsRequests, oldUserBookingsRequests);
         } else if (result.getMessage().equals("Not logged in")) {
-            logout(s);
+            logout();
         } else {
             Toast.makeText(activity.getBaseContext(), result.getMessage(), Toast.LENGTH_SHORT).show();
         }
@@ -232,7 +236,7 @@ public class Requests extends AsyncTask<String, String, String> {
 
             new PrenotazioniFragment.Task(view, activity).execute(userBookingsRequests, oldUserBookingsRequests);
         } else if (result.getMessage().equals("Not logged in")) {
-            logout(s);
+            logout();
         } else {
             Toast.makeText(activity.getBaseContext(), result.getMessage(), Toast.LENGTH_SHORT).show();
         }
@@ -244,13 +248,13 @@ public class Requests extends AsyncTask<String, String, String> {
         if (result.getMessage().equals("OK")) {
             Toast.makeText(activity.getBaseContext(), "Prenotazione effettuata", Toast.LENGTH_SHORT).show();
         } else if (result.getMessage().equals("Not logged in")) {
-            logout(s);
+            logout();
         } else {
             Toast.makeText(activity.getBaseContext(), result.getMessage(), Toast.LENGTH_SHORT).show();
         }
     }
 
-    private void logout(String s) {
+    private void logout() {
         NavigationView navigationView = activity.findViewById(R.id.nav_view);
         TextView username = navigationView.findViewById(R.id.usernameTextView);
         Toast.makeText(activity.getBaseContext(), "Logged out", Toast.LENGTH_SHORT).show();
@@ -259,7 +263,7 @@ public class Requests extends AsyncTask<String, String, String> {
         navigationView.getMenu().findItem(R.id.nav_login).setVisible(true);
         navigationView.getMenu().findItem(R.id.nav_logout).setVisible(false);
         navigationView.getMenu().findItem(R.id.nav_prenotazioni).setVisible(false);
-        username.setText("Ospite");
+        username.setText(R.string.ospite);
         ((MainActivity) activity).setLoggedIn(false);
     }
 }

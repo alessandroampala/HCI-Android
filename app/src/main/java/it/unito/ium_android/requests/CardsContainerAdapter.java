@@ -1,32 +1,22 @@
 package it.unito.ium_android.requests;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.google.android.material.button.MaterialButton;
-
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.List;
-
 import it.unito.ium_android.MainActivity;
 import it.unito.ium_android.R;
-import it.unito.ium_android.requests.Lesson;
-import it.unito.ium_android.ui.booking.BookingFragment;
 
 public class CardsContainerAdapter extends RecyclerView.Adapter<CardsContainerAdapter.CardsContainerViewHolder> {
 
-    private List<Lesson> data;
-    private MainActivity activity;
+    private final List<Lesson> data;
+    private final MainActivity activity;
 
     public CardsContainerAdapter(List<Lesson> data, MainActivity activity) {
         this.data = data;
@@ -37,8 +27,7 @@ public class CardsContainerAdapter extends RecyclerView.Adapter<CardsContainerAd
     @Override
     public CardsContainerAdapter.CardsContainerViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.card_design, parent, false);
-        CardsContainerAdapter.CardsContainerViewHolder cardsContainerViewHolder = new CardsContainerAdapter.CardsContainerViewHolder(view);
-        return cardsContainerViewHolder;
+        return new CardsContainerViewHolder(view);
     }
 
     @Override
@@ -46,14 +35,11 @@ public class CardsContainerAdapter extends RecyclerView.Adapter<CardsContainerAd
         Lesson lesson = this.data.get(position);
 
         holder.materia.setText(lesson.getCourse().getName());
-        holder.docente.setText(lesson.getTeacher().getName() + " " + lesson.getTeacher().getSurname());
-        holder.prenota.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Bundle bundle = new Bundle();
-                bundle.putSerializable("lesson", lesson);
-                Navigation.findNavController(activity, R.id.nav_host_fragment).navigate(R.id.nav_booking, bundle);
-            }
+        holder.docente.setText(String.format("%s %s", lesson.getTeacher().getName(), lesson.getTeacher().getSurname()));
+        holder.prenota.setOnClickListener(v -> {
+            Bundle bundle = new Bundle();
+            bundle.putSerializable("lesson", lesson);
+            Navigation.findNavController(activity, R.id.nav_host_fragment).navigate(R.id.nav_booking, bundle);
         });
     }
 
