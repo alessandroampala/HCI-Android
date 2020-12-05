@@ -1,6 +1,7 @@
 package it.unito.ium_android.requests;
 
 import android.app.Activity;
+import android.app.Fragment;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
@@ -8,6 +9,10 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.FragmentManager;
+import androidx.navigation.NavDirections;
+import androidx.navigation.NavOptions;
 import androidx.navigation.Navigation;
 
 import com.google.android.material.navigation.NavigationView;
@@ -70,8 +75,10 @@ public class Requests extends AsyncTask<String, String, String> {
         if (this.className.equals("getSessionLogin") || this.className.equals("getUserBookings") || this.className.equals("oldUserBookings") || this.className.equals("disdici") || this.className.equals("svolta") || this.className.equals("logout") || this.className.equals("prenotazioniDocente") || this.className.equals("userBookings") || this.className.equals("prenotaLezioni")) {
             SharedPreferences sharedPref = this.activity.getPreferences(Context.MODE_PRIVATE);
             String sessionId = "";
-            if (sharedPref.contains("sessionId"))
+            if (sharedPref!=null && sharedPref.contains("sessionId"))
                 sessionId = sharedPref.getString("sessionId", "");
+            else
+                sessionId = "";
             connection.setRequestProperty("cookie", sessionId);
         }
         connection.setDoInput(true);
@@ -153,11 +160,11 @@ public class Requests extends AsyncTask<String, String, String> {
         NavigationView navigationView = activity.findViewById(R.id.nav_view);
         TextView username = navigationView.findViewById(R.id.usernameTextView);
         if (result.getMessage().equals("OK")) {
-            Toast.makeText(activity.getBaseContext(), "login fatto", Toast.LENGTH_SHORT).show();
             navigationView.getMenu().findItem(R.id.nav_login).setVisible(false);
             navigationView.getMenu().findItem(R.id.nav_logout).setVisible(true);
             navigationView.getMenu().findItem(R.id.nav_prenotazioni).setVisible(true);
             navigationView.getMenu().getItem(0).setChecked(true);
+            Navigation.findNavController(activity, R.id.nav_host_fragment).popBackStack(R.id.mobile_navigation, false);
             Navigation.findNavController(activity, R.id.nav_host_fragment).navigate(R.id.nav_prenota);
             username.setText(result.getData().getUsername());
             ((MainActivity) activity).setLoggedIn(true);
@@ -174,11 +181,9 @@ public class Requests extends AsyncTask<String, String, String> {
     private void sessionCheck(String s) {
         jsonMessage<User> result = new Gson().fromJson(s, new TypeToken<jsonMessage<User>>() {
         }.getType());
-
         NavigationView navigationView = activity.findViewById(R.id.nav_view);
         TextView username = navigationView.findViewById(R.id.usernameTextView);
         if (result.getMessage().equals("Sessione valida")) {
-            Toast.makeText(activity.getBaseContext(), result.getData().getUsername(), Toast.LENGTH_SHORT).show();
             navigationView.getMenu().findItem(R.id.nav_login).setVisible(false);
             navigationView.getMenu().findItem(R.id.nav_logout).setVisible(true);
             navigationView.getMenu().findItem(R.id.nav_prenotazioni).setVisible(true);
@@ -186,7 +191,6 @@ public class Requests extends AsyncTask<String, String, String> {
             username.setText(result.getData().getUsername());
             ((MainActivity) activity).setLoggedIn(true);
         } else {
-            Toast.makeText(activity.getBaseContext(), result.getMessage(), Toast.LENGTH_SHORT).show();
             navigationView.getMenu().findItem(R.id.nav_login).setVisible(true);
             navigationView.getMenu().findItem(R.id.nav_logout).setVisible(false);
             navigationView.getMenu().findItem(R.id.nav_prenotazioni).setVisible(false);
@@ -256,13 +260,13 @@ public class Requests extends AsyncTask<String, String, String> {
 
     private void logout() {
         NavigationView navigationView = activity.findViewById(R.id.nav_view);
-        TextView username = navigationView.findViewById(R.id.usernameTextView);
-        Toast.makeText(activity.getBaseContext(), "Logged out", Toast.LENGTH_SHORT).show();
+        Navigation.findNavController(activity, R.id.nav_host_fragment).popBackStack(R.id.mobile_navigation, false);
         Navigation.findNavController(activity, R.id.nav_host_fragment).navigate(R.id.nav_prenota);
-        navigationView.setCheckedItem(R.id.nav_prenota);
         navigationView.getMenu().findItem(R.id.nav_login).setVisible(true);
         navigationView.getMenu().findItem(R.id.nav_logout).setVisible(false);
         navigationView.getMenu().findItem(R.id.nav_prenotazioni).setVisible(false);
+        TextView username = navigationView.findViewById(R.id.usernameTextView);
+        activity.findViewById(R.id.bookButton).setVisibility(View.GONE);
         username.setText(R.string.ospite);
         ((MainActivity) activity).setLoggedIn(false);
     }

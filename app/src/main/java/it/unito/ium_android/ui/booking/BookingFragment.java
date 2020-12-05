@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,6 +40,7 @@ public class BookingFragment extends Fragment implements View.OnClickListener {
     private List<Integer> recordBookings;
     private Integer weekPosition = 0;
     private MaterialButton bookBtn;
+    private BookingFragment bookingFragment;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -46,6 +48,7 @@ public class BookingFragment extends Fragment implements View.OnClickListener {
 
         lesson = (Lesson) getArguments().getSerializable("lesson");
         recordBookings = new ArrayList<>();
+        bookingFragment = this;
 
         if (((MainActivity) requireActivity()).isLoggedIn()) {
             bookBtn = requireActivity().findViewById(R.id.bookButton);
@@ -68,22 +71,24 @@ public class BookingFragment extends Fragment implements View.OnClickListener {
 
                 new AsyncTask<Void, Void, Void>() {
                     @Override
-                    protected Void doInBackground(Void... voids) {
+                    protected Void doInBackground(Void... Void) {
                         try {
                             prenotaLezioni.get();
                         } catch (ExecutionException | InterruptedException e) {
                             e.printStackTrace();
                         }
                         recordBookings.clear();
-                        executeQuery(root);
                         return null;
                     }
 
                     @Override
                     protected void onPostExecute(Void aVoid) {
                         super.onPostExecute(aVoid);
-                        root.findViewById(R.id.loadingPanel).setVisibility(View.VISIBLE);
-                        root.findViewById(R.id.hoursContainer).setVisibility(View.GONE);
+                        if (bookingFragment.isAdded()) {
+                            root.findViewById(R.id.loadingPanel).setVisibility(View.VISIBLE);
+                            root.findViewById(R.id.hoursContainer).setVisibility(View.GONE);
+                            executeQuery(root);
+                        }
                     }
                 }.execute();
             });
@@ -239,7 +244,7 @@ public class BookingFragment extends Fragment implements View.OnClickListener {
     private void updateBookings(int start, int end) {
         for (int i = 5; i < 10; i++) {
             week.get(i).setBackgroundResource(R.drawable.green);
-            if (((MainActivity) requireActivity()).isLoggedIn())
+            if (bookingFragment.isAdded() && ((MainActivity) requireActivity()).isLoggedIn())
                 week.get(i).setOnClickListener(this);
             week.get(i).setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
         }
