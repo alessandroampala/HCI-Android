@@ -174,7 +174,7 @@ public class Requests extends AsyncTask<String, String, String> {
         NavigationView navigationView = activity.findViewById(R.id.nav_view);
         TextView username = navigationView.findViewById(R.id.usernameTextView);
         if (result.getMessage().equals("Sessione valida")) {
-            Toast.makeText(activity.getApplicationContext(), result.getData().getUsername(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(activity.getBaseContext(), result.getData().getUsername(), Toast.LENGTH_SHORT).show();
             navigationView.getMenu().findItem(R.id.nav_login).setVisible(false);
             navigationView.getMenu().findItem(R.id.nav_logout).setVisible(true);
             navigationView.getMenu().findItem(R.id.nav_prenotazioni).setVisible(true);
@@ -182,7 +182,7 @@ public class Requests extends AsyncTask<String, String, String> {
             username.setText(result.getData().getUsername());
             ((MainActivity) activity).setLoggedIn(true);
         } else {
-            Toast.makeText(activity.getApplicationContext(), result.getMessage(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(activity.getBaseContext(), result.getMessage(), Toast.LENGTH_SHORT).show();
             navigationView.getMenu().findItem(R.id.nav_login).setVisible(true);
             navigationView.getMenu().findItem(R.id.nav_logout).setVisible(false);
             navigationView.getMenu().findItem(R.id.nav_prenotazioni).setVisible(false);
@@ -207,8 +207,10 @@ public class Requests extends AsyncTask<String, String, String> {
             oldUserBookingsRequests.execute(data, url, method);
 
             new PrenotazioniFragment.Task(view, activity).execute(userBookingsRequests, oldUserBookingsRequests);
+        } else if (result.getMessage().equals("Not logged in")) {
+            logout(s);
         } else {
-            Toast.makeText(activity.getApplicationContext(), result.getMessage(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(activity.getBaseContext(), result.getMessage(), Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -229,8 +231,10 @@ public class Requests extends AsyncTask<String, String, String> {
             oldUserBookingsRequests.execute(data, url, method);
 
             new PrenotazioniFragment.Task(view, activity).execute(userBookingsRequests, oldUserBookingsRequests);
+        } else if (result.getMessage().equals("Not logged in")) {
+            logout(s);
         } else {
-            Toast.makeText(activity.getApplicationContext(), result.getMessage(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(activity.getBaseContext(), result.getMessage(), Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -238,16 +242,18 @@ public class Requests extends AsyncTask<String, String, String> {
         jsonMessage<List<Object>> result = new Gson().fromJson(s, new TypeToken<jsonMessage<List<Object>>>() {
         }.getType());
         if (result.getMessage().equals("OK")) {
-            Toast.makeText(activity.getApplicationContext(), "Prenotazione effettuata", Toast.LENGTH_SHORT).show();
+            Toast.makeText(activity.getBaseContext(), "Prenotazione effettuata", Toast.LENGTH_SHORT).show();
+        } else if (result.getMessage().equals("Not logged in")) {
+            logout(s);
         } else {
-            Toast.makeText(activity.getApplicationContext(), result.getMessage(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(activity.getBaseContext(), result.getMessage(), Toast.LENGTH_SHORT).show();
         }
     }
 
     private void logout(String s) {
         NavigationView navigationView = activity.findViewById(R.id.nav_view);
         TextView username = navigationView.findViewById(R.id.usernameTextView);
-        Toast.makeText(activity.getApplicationContext(), "Logged out", Toast.LENGTH_SHORT).show();
+        Toast.makeText(activity.getBaseContext(), "Logged out", Toast.LENGTH_SHORT).show();
         Navigation.findNavController(activity, R.id.nav_host_fragment).navigate(R.id.nav_prenota);
         navigationView.setCheckedItem(R.id.nav_prenota);
         navigationView.getMenu().findItem(R.id.nav_login).setVisible(true);

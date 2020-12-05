@@ -34,7 +34,7 @@ public class LoginFragment extends Fragment {
                 String username = ((TextInputLayout) root.findViewById(R.id.usernameEditText)).getEditText().getText().toString();
                 String password = ((TextInputLayout) root.findViewById(R.id.passwordEditText)).getEditText().getText().toString();
                 if (username.equals("") || password.equals("")) {
-                    Toast.makeText(getActivity().getApplicationContext(), "Username e/o Password sbagliati", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity().getBaseContext(), "Username e/o Password sbagliati", Toast.LENGTH_SHORT).show();
                 } else {
                     Requests post = new Requests(getActivity(), "login");
                     try {

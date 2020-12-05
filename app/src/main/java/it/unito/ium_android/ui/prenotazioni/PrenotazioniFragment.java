@@ -125,12 +125,12 @@ public class PrenotazioniFragment extends Fragment {
             if (result[0].getMessage().equals("OK"))
                 lessonsArchive(result[0].getData(), concatAdapter);
             else {
-                Toast.makeText(activity.getApplicationContext(), result[0].getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(activity.getBaseContext(), result[0].getMessage(), Toast.LENGTH_SHORT).show();
             }
             if (result[1].getMessage().equals("OK"))
                 oldLessonsArchive(result[1].getData(), concatAdapter);
             else {
-                Toast.makeText(activity.getApplicationContext(), result[1].getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(activity.getBaseContext(), result[1].getMessage(), Toast.LENGTH_SHORT).show();
                 loadingLayout.setVisibility(view.GONE);
             }
 

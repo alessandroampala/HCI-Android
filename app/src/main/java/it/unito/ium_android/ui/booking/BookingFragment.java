@@ -64,7 +64,7 @@ public class BookingFragment extends Fragment implements View.OnClickListener {
                 @Override
                 public void onClick(View v) {
                     if (recordBookings.isEmpty()) {
-                        Toast.makeText(getContext(), "Prenotazioni non selezionate", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity().getBaseContext(), "Prenotazioni non selezionate", Toast.LENGTH_SHORT).show();
                         return;
                     }
                     Requests prenotaLezioni = new Requests(getActivity(), "prenotaLezioni");

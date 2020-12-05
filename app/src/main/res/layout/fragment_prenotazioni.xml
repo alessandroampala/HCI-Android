@@ -16,6 +16,18 @@
         android:text="@string/non_ci_sono_ripetizioni_attive"
         android:visibility="gone" />
 
+    <RelativeLayout
+        android:id="@+id/loadingPanel"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center">
+
+        <ProgressBar
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:indeterminate="true" />
+    </RelativeLayout>
+
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/refreshPanel"
         android:layout_width="match_parent"
@@ -29,16 +41,4 @@
 
         </androidx.recyclerview.widget.RecyclerView>
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
-
-    <RelativeLayout
-        android:id="@+id/loadingPanel"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="center">
-
-        <ProgressBar
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:indeterminate="true" />
-    </RelativeLayout>
 </LinearLayout>

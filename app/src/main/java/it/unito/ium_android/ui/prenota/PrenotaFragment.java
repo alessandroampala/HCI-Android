@@ -248,7 +248,7 @@ public class PrenotaFragment extends Fragment {
 
                 cardsContainer.setAdapter(cardsContainerAdapter);
             } else {
-                Toast.makeText(activity.getApplicationContext(), result.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(activity.getBaseContext(), result.getMessage(), Toast.LENGTH_SHORT).show();
                 loadingLayout.setVisibility(view.GONE);
                 cardsContainer.setVisibility(view.GONE);
                 noLessons.setVisibility(view.VISIBLE);
@@ -275,7 +275,7 @@ public class PrenotaFragment extends Fragment {
                 SpinAdapterDocenti spinAdapterDocenti = new SpinAdapterDocenti(this.activity.getApplicationContext(), android.R.layout.simple_spinner_dropdown_item, result.getData());
                 spinnerDocenti.setAdapter(spinAdapterDocenti);
             } else {
-                Toast.makeText(activity.getApplicationContext(), result.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(activity.getBaseContext(), result.getMessage(), Toast.LENGTH_SHORT).show();
             }
         }
 
@@ -298,7 +298,7 @@ public class PrenotaFragment extends Fragment {
                 SpinAdapterMaterie spinAdapterMaterie = new SpinAdapterMaterie(this.activity.getApplicationContext(), android.R.layout.simple_spinner_dropdown_item, result.getData());
                 spinnerMaterie.setAdapter(spinAdapterMaterie);
             } else {
-                Toast.makeText(activity.getApplicationContext(), result.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(activity.getBaseContext(), result.getMessage(), Toast.LENGTH_SHORT).show();
             }
         }
     }
