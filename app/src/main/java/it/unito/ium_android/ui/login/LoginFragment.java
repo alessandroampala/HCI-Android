@@ -5,13 +5,17 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputLayout;
+
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.Objects;
+
 import it.unito.ium_android.R;
 import it.unito.ium_android.requests.Requests;
 
@@ -21,6 +25,7 @@ public class LoginFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_login, container, false);
+        //setRetainInstance(true);
 
         MaterialButton btnLogin = root.findViewById(R.id.btnLogin);
         btnLogin.setOnClickListener(view -> {
@@ -42,4 +47,26 @@ public class LoginFragment extends Fragment {
 
         return root;
     }
+
+    /*@Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        //Save the fragment's state here
+        outState.putString("username", Objects.requireNonNull(((TextInputLayout) getView().findViewById(R.id.usernameEditText)).getEditText()).getText().toString());
+        outState.putString("password", Objects.requireNonNull(((TextInputLayout) getView().findViewById(R.id.passwordEditText)).getEditText()).getText().toString());
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        if (savedInstanceState != null) {
+            //Restore the fragment's state here
+            String username = savedInstanceState.getString("username");
+            String password = savedInstanceState.getString("password");
+
+            (((TextInputLayout) getView().findViewById(R.id.usernameEditText)).getEditText()).setText(username);
+            (((TextInputLayout) getView().findViewById(R.id.passwordEditText)).getEditText()).setText(password);
+        }
+    }*/
+
 }
