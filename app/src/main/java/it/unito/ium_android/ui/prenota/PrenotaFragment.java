@@ -101,14 +101,14 @@ public class PrenotaFragment extends Fragment {
     private void makeRequests(View root) {
         Requests teacherRequests = new Requests(getActivity(), "docenti", root);
 
-        String data = "action=docenti";
+        String data = "action=teachers";
         String url = "http://10.0.2.2:8080/ProgettoTWEB_war_exploded/Controller";
         String method = "GET";
         teacherRequests.execute(data, url, method);
 
         Requests courseRequests = new Requests(getActivity(), "materie", root);
 
-        data = "action=materie";
+        data = "action=courses";
         url = "http://10.0.2.2:8080/ProgettoTWEB_war_exploded/Controller";
         method = "GET";
 

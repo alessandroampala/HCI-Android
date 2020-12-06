@@ -61,7 +61,7 @@ public class BookingFragment extends Fragment implements View.OnClickListener {
                 }
                 Requests prenotaLezioni = new Requests(getActivity(), "prenotaLezioni");
                 try {
-                    String data = "course=" + URLEncoder.encode(lesson.getCourse().getName(), "UTF-8") + "&teacherId=" + URLEncoder.encode(String.valueOf(lesson.getTeacher().getId()), "UTF-8") + "&lessonSlots=" + URLEncoder.encode(recordBookings.toString(), "UTF-8") + "&action=prenotaLezioni";
+                    String data = "course=" + URLEncoder.encode(lesson.getCourse().getName(), "UTF-8") + "&teacherId=" + URLEncoder.encode(String.valueOf(lesson.getTeacher().getId()), "UTF-8") + "&lessonSlots=" + URLEncoder.encode(recordBookings.toString(), "UTF-8") + "&action=bookLessons";
                     String url = "http://10.0.2.2:8080/ProgettoTWEB_war_exploded/Controller";
                     String method = "POST";
                     prenotaLezioni.execute(data, url, method);
