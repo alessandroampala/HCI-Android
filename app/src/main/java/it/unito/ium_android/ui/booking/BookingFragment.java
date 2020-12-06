@@ -59,7 +59,7 @@ public class BookingFragment extends Fragment implements View.OnClickListener {
                     Toast.makeText(requireActivity().getBaseContext(), "Prenotazioni non selezionate", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                Requests prenotaLezioni = new Requests(getActivity(), "prenotaLezioni");
+                Requests prenotaLezioni = new Requests(getActivity(), "bookLessons");
                 try {
                     String data = "course=" + URLEncoder.encode(lesson.getCourse().getName(), "UTF-8") + "&teacherId=" + URLEncoder.encode(String.valueOf(lesson.getTeacher().getId()), "UTF-8") + "&lessonSlots=" + URLEncoder.encode(recordBookings.toString(), "UTF-8") + "&action=bookLessons";
                     String method = "POST";
@@ -94,7 +94,6 @@ public class BookingFragment extends Fragment implements View.OnClickListener {
         }
 
         executeQuery(root);
-
         addWeekBtn(root);
 
         for (int i = 0; i < 5; i++) {

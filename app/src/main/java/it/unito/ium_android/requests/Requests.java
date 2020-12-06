@@ -1,7 +1,6 @@
 package it.unito.ium_android.requests;
 
 import android.app.Activity;
-import android.app.Fragment;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
@@ -10,10 +9,6 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.fragment.app.FragmentManager;
-import androidx.navigation.NavDirections;
-import androidx.navigation.NavOptions;
 import androidx.navigation.Navigation;
 
 import com.google.android.material.navigation.NavigationView;
@@ -26,7 +21,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.ProtocolException;
-import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.util.List;
 
@@ -75,7 +69,7 @@ public class Requests extends AsyncTask<String, String, String> {
         }
         connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded; utf-8");
         connection.setRequestProperty("Content-Length", String.valueOf(strings[0].length()));
-        if (this.className.equals("getSessionLogin") || this.className.equals("getUserBookings") || this.className.equals("oldUserBookings") || this.className.equals("disdici") || this.className.equals("svolta") || this.className.equals("logout") || this.className.equals("prenotazioniDocente") || this.className.equals("userBookings") || this.className.equals("prenotaLezioni")) {
+        if (this.className.equals("getSessionLogin") || this.className.equals("getUserBookings") || this.className.equals("oldUserBookings") || this.className.equals("cancelBooking") || this.className.equals("markBooking") || this.className.equals("logout") || this.className.equals("prenotazioniDocente") || this.className.equals("userBookings") || this.className.equals("bookLessons")) {
             SharedPreferences sharedPref = this.activity.getPreferences(Context.MODE_PRIVATE);
             String sessionId = "";
             if (sharedPref!=null && sharedPref.contains("sessionId"))
@@ -141,14 +135,14 @@ public class Requests extends AsyncTask<String, String, String> {
             case "getSessionLogin":
                 sessionCheck(s);
                 break;
-            case "disdici":
-                disdici(s);
+            case "cancelBooking":
+                cancelBooking(s);
                 break;
-            case "svolta":
-                svolta(s);
+            case "markBooking":
+                markBooking(s);
                 break;
-            case "prenotaLezioni":
-                prenotaLezioni(s);
+            case "bookLessons":
+                bookLessons(s);
                 break;
             case "logout":
                 logout();
@@ -214,7 +208,7 @@ public class Requests extends AsyncTask<String, String, String> {
         }
     }
 
-    private void disdici(String s) {
+    private void cancelBooking(String s) {
         jsonMessage<List<Object>> result = new Gson().fromJson(s, new TypeToken<jsonMessage<List<Object>>>() {
         }.getType());
         if (result.getMessage().equals("OK")) {
@@ -236,7 +230,7 @@ public class Requests extends AsyncTask<String, String, String> {
         }
     }
 
-    private void svolta(String s) {
+    private void markBooking(String s) {
         jsonMessage<List<Object>> result = new Gson().fromJson(s, new TypeToken<jsonMessage<List<Object>>>() {
         }.getType());
         if (result.getMessage().equals("OK")) {
@@ -258,7 +252,7 @@ public class Requests extends AsyncTask<String, String, String> {
         }
     }
 
-    private void prenotaLezioni(String s) {
+    private void bookLessons(String s) {
         jsonMessage<List<Object>> result = new Gson().fromJson(s, new TypeToken<jsonMessage<List<Object>>>() {
         }.getType());
         if (result.getMessage().equals("OK")) {
