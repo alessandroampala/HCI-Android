@@ -51,9 +51,8 @@ public class MainActivity extends AppCompatActivity{
                 case R.id.nav_logout:
                     Requests requests = new Requests(MainActivity.this, "logout");
                     String data = "action=logout";
-                    String url = "http://10.0.2.2:8080/ProgettoTWEB_war_exploded/Controller";
                     String method = "POST";
-                    requests.execute(data, url, method);
+                    requests.execute(data, Requests.url, method);
                     break;
             }
 
@@ -74,9 +73,8 @@ public class MainActivity extends AppCompatActivity{
         super.onResume();
         Requests requests = new Requests(this, "getSessionLogin");
         String data = "action=getSessionLogin";
-        String url = "http://10.0.2.2:8080/ProgettoTWEB_war_exploded/Controller";
         String method = "POST";
-        requests.execute(data, url, method);
+        requests.execute(data, Requests.url, method);
     }
 
     public void setLoggedIn(boolean loggedIn) {

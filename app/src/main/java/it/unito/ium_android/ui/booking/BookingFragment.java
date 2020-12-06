@@ -62,9 +62,8 @@ public class BookingFragment extends Fragment implements View.OnClickListener {
                 Requests prenotaLezioni = new Requests(getActivity(), "prenotaLezioni");
                 try {
                     String data = "course=" + URLEncoder.encode(lesson.getCourse().getName(), "UTF-8") + "&teacherId=" + URLEncoder.encode(String.valueOf(lesson.getTeacher().getId()), "UTF-8") + "&lessonSlots=" + URLEncoder.encode(recordBookings.toString(), "UTF-8") + "&action=bookLessons";
-                    String url = "http://10.0.2.2:8080/ProgettoTWEB_war_exploded/Controller";
                     String method = "POST";
-                    prenotaLezioni.execute(data, url, method);
+                    prenotaLezioni.execute(data, Requests.url, method);
                 } catch (UnsupportedEncodingException e) {
                     e.printStackTrace();
                 }
@@ -109,18 +108,16 @@ public class BookingFragment extends Fragment implements View.OnClickListener {
         Requests prenotazioniDocenteRequests = new Requests(getActivity(), "prenotazioniDocente");
         try {
             String data = "course=" + URLEncoder.encode(lesson.getCourse().getName(), "UTF-8") + "&teacherId=" + URLEncoder.encode(String.valueOf(lesson.getTeacher().getId()), "UTF-8") + "&teacherId=" + URLEncoder.encode(String.valueOf(lesson.getTeacher().getId()), "UTF-8") + "&action=teacherBooking";
-            String url = "http://10.0.2.2:8080/ProgettoTWEB_war_exploded/Controller";
             String method = "GET";
-            prenotazioniDocenteRequests.execute(data, url, method);
+            prenotazioniDocenteRequests.execute(data, Requests.url, method);
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
 
         Requests userBookingsRequests = new Requests(getActivity(), "userBookings");
         String data = "action=userBooking&isAndroid=true";
-        String url = "http://10.0.2.2:8080/ProgettoTWEB_war_exploded/Controller";
         String method = "GET";
-        userBookingsRequests.execute(data, url, method);
+        userBookingsRequests.execute(data, Requests.url, method);
 
         new Task(this, root).execute(prenotazioniDocenteRequests, userBookingsRequests);
     }
@@ -300,6 +297,7 @@ public class BookingFragment extends Fragment implements View.OnClickListener {
                 }
         }
 
+        if(userBookings != null)
         for (Booking booking : userBookings) {
             if (booking.getLessonSlot() >= start && booking.getLessonSlot() < end)
                 switch (booking.getLessonSlot() % 5) {

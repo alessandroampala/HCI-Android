@@ -102,24 +102,21 @@ public class PrenotaFragment extends Fragment {
         Requests teacherRequests = new Requests(getActivity(), "docenti", root);
 
         String data = "action=teachers";
-        String url = "http://10.0.2.2:8080/ProgettoTWEB_war_exploded/Controller";
         String method = "GET";
-        teacherRequests.execute(data, url, method);
+        teacherRequests.execute(data, Requests.url, method);
 
         Requests courseRequests = new Requests(getActivity(), "materie", root);
 
         data = "action=courses";
-        url = "http://10.0.2.2:8080/ProgettoTWEB_war_exploded/Controller";
         method = "GET";
 
-        courseRequests.execute(data, url, method);
+        courseRequests.execute(data, Requests.url, method);
 
         Requests lessonRequests = new Requests(getActivity(), "lessons", root);
         try {
             data = "course=" + URLEncoder.encode(materia, "UTF-8") + "&teacherId=" + URLEncoder.encode(docente, "UTF-8") + "&action=lessons";
-            url = "http://10.0.2.2:8080/ProgettoTWEB_war_exploded/Controller";
             method = "POST";
-            lessonRequests.execute(data, url, method);
+            lessonRequests.execute(data, Requests.url, method);
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
@@ -131,9 +128,8 @@ public class PrenotaFragment extends Fragment {
         Requests request = new Requests(getActivity(), "lessons", root);
         try {
             String data = "course=" + URLEncoder.encode(materia, "UTF-8") + "&teacherId=" + URLEncoder.encode(docente, "UTF-8") + "&action=lessons";
-            String url = "http://10.0.2.2:8080/ProgettoTWEB_war_exploded/Controller";
             String method = "POST";
-            request.execute(data, url, method);
+            request.execute(data, Requests.url, method);
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }

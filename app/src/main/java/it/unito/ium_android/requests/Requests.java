@@ -38,6 +38,8 @@ public class Requests extends AsyncTask<String, String, String> {
     private final Activity activity;
     private final String className;
     private final View view;
+    //public final static String url = "http://10.0.2.2:8080/ProgettoTWEB_war_exploded/Controller";
+    public final static String url = "http://192.168.1.111:8080/ProgettoTWEB_war_exploded/Controller";
 
     public Requests(Activity activity, String className) {
         this.activity = activity;
@@ -218,13 +220,11 @@ public class Requests extends AsyncTask<String, String, String> {
         if (result.getMessage().equals("OK")) {
             Requests userBookingsRequests = new Requests(activity, "getUserBookings", view);
             String data = "action=userBooking&isAndroid=true";
-            String url = "http://10.0.2.2:8080/ProgettoTWEB_war_exploded/Controller";
             String method = "GET";
             userBookingsRequests.execute(data, url, method);
 
             Requests oldUserBookingsRequests = new Requests(activity, "oldUserBookings", view);
             data = "action=oldUserBookings";
-            url = "http://10.0.2.2:8080/ProgettoTWEB_war_exploded/Controller";
             method = "GET";
             oldUserBookingsRequests.execute(data, url, method);
 
@@ -242,13 +242,11 @@ public class Requests extends AsyncTask<String, String, String> {
         if (result.getMessage().equals("OK")) {
             Requests userBookingsRequests = new Requests(activity, "getUserBookings", view);
             String data = "action=userBooking&isAndroid=true";
-            String url = "http://10.0.2.2:8080/ProgettoTWEB_war_exploded/Controller";
             String method = "GET";
             userBookingsRequests.execute(data, url, method);
 
             Requests oldUserBookingsRequests = new Requests(activity, "oldUserBookings", view);
             data = "action=oldUserBookings";
-            url = "http://10.0.2.2:8080/ProgettoTWEB_war_exploded/Controller";
             method = "GET";
             oldUserBookingsRequests.execute(data, url, method);
 
