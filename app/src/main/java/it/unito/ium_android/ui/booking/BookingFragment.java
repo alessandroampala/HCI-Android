@@ -365,7 +365,7 @@ public class BookingFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if (((MainActivity) requireActivity()).isLoggedIn()) {
+        if (((MainActivity) requireActivity()).isLoggedIn() && bookBtn != null) {
             bookBtn.setOnClickListener(null);
             bookBtn.setVisibility(View.GONE);
         }

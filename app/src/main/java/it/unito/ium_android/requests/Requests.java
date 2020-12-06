@@ -172,7 +172,7 @@ public class Requests extends AsyncTask<String, String, String> {
             username.setText(result.getData().getUsername());
             ((MainActivity) activity).setLoggedIn(true);
             hideKeyboard(activity);
-
+            navigationView.setCheckedItem(R.id.nav_prenota);
         } else {
             Toast.makeText(activity.getBaseContext(), result.getMessage(), Toast.LENGTH_SHORT).show();
             navigationView.getMenu().findItem(R.id.nav_login).setVisible(true);
@@ -281,5 +281,6 @@ public class Requests extends AsyncTask<String, String, String> {
         activity.findViewById(R.id.bookButton).setVisibility(View.GONE);
         username.setText(R.string.ospite);
         ((MainActivity) activity).setLoggedIn(false);
+        navigationView.setCheckedItem(R.id.nav_prenota);
     }
 }
