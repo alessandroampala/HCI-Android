@@ -1,18 +1,14 @@
 package it.unito.ium_android.requests;
 
 import android.app.Activity;
-import android.app.Fragment;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.fragment.app.FragmentManager;
-import androidx.navigation.NavDirections;
-import androidx.navigation.NavOptions;
 import androidx.navigation.Navigation;
 
 import com.google.android.material.navigation.NavigationView;
@@ -25,7 +21,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.ProtocolException;
-import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.util.List;
 
@@ -37,6 +32,8 @@ public class Requests extends AsyncTask<String, String, String> {
     private final Activity activity;
     private final String className;
     private final View view;
+    //public final static String url = "http://10.0.2.2:8080/ProgettoTWEB_war_exploded/Controller";
+    public final static String url = "http://192.168.1.111:8080/ProgettoTWEB_war_exploded/Controller";
 
     public Requests(Activity activity, String className) {
         this.activity = activity;
@@ -72,10 +69,10 @@ public class Requests extends AsyncTask<String, String, String> {
         }
         connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded; utf-8");
         connection.setRequestProperty("Content-Length", String.valueOf(strings[0].length()));
-        if (this.className.equals("getSessionLogin") || this.className.equals("getUserBookings") || this.className.equals("oldUserBookings") || this.className.equals("disdici") || this.className.equals("svolta") || this.className.equals("logout") || this.className.equals("prenotazioniDocente") || this.className.equals("userBookings") || this.className.equals("prenotaLezioni")) {
+        if (this.className.equals("getSessionLogin") || this.className.equals("getUserBookings") || this.className.equals("oldUserBookings") || this.className.equals("cancelBooking") || this.className.equals("markBooking") || this.className.equals("logout") || this.className.equals("prenotazioniDocente") || this.className.equals("userBookings") || this.className.equals("bookLessons")) {
             SharedPreferences sharedPref = this.activity.getPreferences(Context.MODE_PRIVATE);
             String sessionId = "";
-            if (sharedPref != null && sharedPref.contains("sessionId"))
+            if (sharedPref!=null && sharedPref.contains("sessionId"))
                 sessionId = sharedPref.getString("sessionId", "");
             else
                 sessionId = "";
@@ -138,17 +135,17 @@ public class Requests extends AsyncTask<String, String, String> {
             case "getSessionLogin":
                 sessionCheck(s);
                 break;
-            case "disdici":
-                disdici(s);
+            case "cancelBooking":
+                cancelBooking(s);
                 break;
-            case "svolta":
-                svolta(s);
+            case "markBooking":
+                markBooking(s);
                 break;
-            case "prenotaLezioni":
-                prenotaLezioni(s);
+            case "bookLessons":
+                bookLessons(s);
                 break;
             case "logout":
-                logout("Logged out");;
+                logout();
                 break;
         }
 
@@ -164,11 +161,12 @@ public class Requests extends AsyncTask<String, String, String> {
             navigationView.getMenu().findItem(R.id.nav_logout).setVisible(true);
             navigationView.getMenu().findItem(R.id.nav_prenotazioni).setVisible(true);
             navigationView.getMenu().getItem(0).setChecked(true);
-            Navigation.findNavController(activity, R.id.nav_host_fragment).popBackStack();
-            navigationView.setCheckedItem(R.id.nav_prenota);
+            Navigation.findNavController(activity, R.id.nav_host_fragment).popBackStack(R.id.mobile_navigation, false);
             Navigation.findNavController(activity, R.id.nav_host_fragment).navigate(R.id.nav_prenota);
             username.setText(result.getData().getUsername());
             ((MainActivity) activity).setLoggedIn(true);
+            hideKeyboard(activity);
+            navigationView.setCheckedItem(R.id.nav_prenota);
         } else {
             Toast.makeText(activity.getBaseContext(), result.getMessage(), Toast.LENGTH_SHORT).show();
             navigationView.getMenu().findItem(R.id.nav_login).setVisible(true);
@@ -179,98 +177,104 @@ public class Requests extends AsyncTask<String, String, String> {
         }
     }
 
+    private void hideKeyboard(Activity activity) {
+        InputMethodManager imm = (InputMethodManager) activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
+        //Find the currently focused view, so we can grab the correct window token from it
+        View view = activity.getCurrentFocus();
+        //If no view currently has focus, create a new one, just so we can grab a window token from it
+        if (view == null) {
+            view = new View(activity);
+        }
+        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+    }
+
     private void sessionCheck(String s) {
         jsonMessage<User> result = new Gson().fromJson(s, new TypeToken<jsonMessage<User>>() {
         }.getType());
         NavigationView navigationView = activity.findViewById(R.id.nav_view);
         TextView username = navigationView.findViewById(R.id.usernameTextView);
         if (result.getMessage().equals("Sessione valida")) {
-            ((MainActivity) activity).setLoggedIn(true);
             navigationView.getMenu().findItem(R.id.nav_login).setVisible(false);
             navigationView.getMenu().findItem(R.id.nav_logout).setVisible(true);
             navigationView.getMenu().findItem(R.id.nav_prenotazioni).setVisible(true);
             navigationView.getMenu().getItem(0).setChecked(true);
             username.setText(result.getData().getUsername());
+            ((MainActivity) activity).setLoggedIn(true);
         } else {
-            ((MainActivity) activity).setLoggedIn(false);
             navigationView.getMenu().findItem(R.id.nav_login).setVisible(true);
             navigationView.getMenu().findItem(R.id.nav_logout).setVisible(false);
             navigationView.getMenu().findItem(R.id.nav_prenotazioni).setVisible(false);
+            ((MainActivity) activity).setLoggedIn(false);
         }
     }
 
-    private void disdici(String s) {
+    private void cancelBooking(String s) {
         jsonMessage<List<Object>> result = new Gson().fromJson(s, new TypeToken<jsonMessage<List<Object>>>() {
         }.getType());
         if (result.getMessage().equals("OK")) {
             Requests userBookingsRequests = new Requests(activity, "getUserBookings", view);
             String data = "action=userBooking&isAndroid=true";
-            String url = "http://10.0.2.2:8080/ProgettoTWEB_war_exploded/Controller";
             String method = "GET";
             userBookingsRequests.execute(data, url, method);
 
             Requests oldUserBookingsRequests = new Requests(activity, "oldUserBookings", view);
             data = "action=oldUserBookings";
-            url = "http://10.0.2.2:8080/ProgettoTWEB_war_exploded/Controller";
             method = "GET";
             oldUserBookingsRequests.execute(data, url, method);
 
             new PrenotazioniFragment.Task(view, activity).execute(userBookingsRequests, oldUserBookingsRequests);
         } else if (result.getMessage().equals("Not logged in")) {
-            logout("Not logged in");
+            logout();
         } else {
             Toast.makeText(activity.getBaseContext(), result.getMessage(), Toast.LENGTH_SHORT).show();
         }
     }
 
-    private void svolta(String s) {
+    private void markBooking(String s) {
         jsonMessage<List<Object>> result = new Gson().fromJson(s, new TypeToken<jsonMessage<List<Object>>>() {
         }.getType());
         if (result.getMessage().equals("OK")) {
             Requests userBookingsRequests = new Requests(activity, "getUserBookings", view);
             String data = "action=userBooking&isAndroid=true";
-            String url = "http://10.0.2.2:8080/ProgettoTWEB_war_exploded/Controller";
             String method = "GET";
             userBookingsRequests.execute(data, url, method);
 
             Requests oldUserBookingsRequests = new Requests(activity, "oldUserBookings", view);
             data = "action=oldUserBookings";
-            url = "http://10.0.2.2:8080/ProgettoTWEB_war_exploded/Controller";
             method = "GET";
             oldUserBookingsRequests.execute(data, url, method);
 
             new PrenotazioniFragment.Task(view, activity).execute(userBookingsRequests, oldUserBookingsRequests);
         } else if (result.getMessage().equals("Not logged in")) {
-            logout("Not logged in");
+            logout();
         } else {
             Toast.makeText(activity.getBaseContext(), result.getMessage(), Toast.LENGTH_SHORT).show();
         }
     }
 
-    private void prenotaLezioni(String s) {
+    private void bookLessons(String s) {
         jsonMessage<List<Object>> result = new Gson().fromJson(s, new TypeToken<jsonMessage<List<Object>>>() {
         }.getType());
         if (result.getMessage().equals("OK")) {
             Toast.makeText(activity.getBaseContext(), "Prenotazione effettuata", Toast.LENGTH_SHORT).show();
         } else if (result.getMessage().equals("Not logged in")) {
-            logout("Not logged in");
+            logout();
         } else {
             Toast.makeText(activity.getBaseContext(), result.getMessage(), Toast.LENGTH_SHORT).show();
         }
     }
 
-    public void logout(String s) {
-        ((MainActivity) activity).setLoggedIn(false);
+    private void logout() {
         NavigationView navigationView = activity.findViewById(R.id.nav_view);
-        Navigation.findNavController(activity, R.id.nav_host_fragment).popBackStack();
-        navigationView.setCheckedItem(R.id.nav_prenota);
+        Navigation.findNavController(activity, R.id.nav_host_fragment).popBackStack(R.id.mobile_navigation, false);
         Navigation.findNavController(activity, R.id.nav_host_fragment).navigate(R.id.nav_prenota);
-        Toast.makeText(activity.getBaseContext(), s, Toast.LENGTH_SHORT).show();
         navigationView.getMenu().findItem(R.id.nav_login).setVisible(true);
         navigationView.getMenu().findItem(R.id.nav_logout).setVisible(false);
         navigationView.getMenu().findItem(R.id.nav_prenotazioni).setVisible(false);
         TextView username = navigationView.findViewById(R.id.usernameTextView);
         activity.findViewById(R.id.bookButton).setVisibility(View.GONE);
         username.setText(R.string.ospite);
+        ((MainActivity) activity).setLoggedIn(false);
+        navigationView.setCheckedItem(R.id.nav_prenota);
     }
 }

@@ -47,11 +47,11 @@ public class BookingFragment extends Fragment implements View.OnClickListener {
         View root = inflater.inflate(R.layout.fragment_booking, container, false);
 
         lesson = (Lesson) getArguments().getSerializable("lesson");
-        bookBtn = requireActivity().findViewById(R.id.bookButton);
         recordBookings = new ArrayList<>();
         bookingFragment = this;
 
         if (((MainActivity) requireActivity()).isLoggedIn()) {
+            bookBtn = requireActivity().findViewById(R.id.bookButton);
             bookBtn.setVisibility(View.VISIBLE);
 
             bookBtn.setOnClickListener(v -> {
@@ -59,12 +59,11 @@ public class BookingFragment extends Fragment implements View.OnClickListener {
                     Toast.makeText(requireActivity().getBaseContext(), "Prenotazioni non selezionate", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                Requests prenotaLezioni = new Requests(getActivity(), "prenotaLezioni");
+                Requests prenotaLezioni = new Requests(getActivity(), "bookLessons");
                 try {
-                    String data = "course=" + URLEncoder.encode(lesson.getCourse().getName(), "UTF-8") + "&teacherId=" + URLEncoder.encode(String.valueOf(lesson.getTeacher().getId()), "UTF-8") + "&lessonSlots=" + URLEncoder.encode(recordBookings.toString(), "UTF-8") + "&action=prenotaLezioni";
-                    String url = "http://10.0.2.2:8080/ProgettoTWEB_war_exploded/Controller";
+                    String data = "course=" + URLEncoder.encode(lesson.getCourse().getName(), "UTF-8") + "&teacherId=" + URLEncoder.encode(String.valueOf(lesson.getTeacher().getId()), "UTF-8") + "&lessonSlots=" + URLEncoder.encode(recordBookings.toString(), "UTF-8") + "&action=bookLessons";
                     String method = "POST";
-                    prenotaLezioni.execute(data, url, method);
+                    prenotaLezioni.execute(data, Requests.url, method);
                 } catch (UnsupportedEncodingException e) {
                     e.printStackTrace();
                 }
@@ -84,16 +83,17 @@ public class BookingFragment extends Fragment implements View.OnClickListener {
                     @Override
                     protected void onPostExecute(Void aVoid) {
                         super.onPostExecute(aVoid);
-                        root.findViewById(R.id.loadingPanel).setVisibility(View.VISIBLE);
-                        root.findViewById(R.id.hoursContainer).setVisibility(View.GONE);
-                        executeQuery(root);
+                        if (bookingFragment.isAdded()) {
+                            root.findViewById(R.id.loadingPanel).setVisibility(View.VISIBLE);
+                            root.findViewById(R.id.hoursContainer).setVisibility(View.GONE);
+                            executeQuery(root);
+                        }
                     }
                 }.execute();
             });
         }
 
         executeQuery(root);
-
         addWeekBtn(root);
 
         for (int i = 0; i < 5; i++) {
@@ -107,18 +107,16 @@ public class BookingFragment extends Fragment implements View.OnClickListener {
         Requests prenotazioniDocenteRequests = new Requests(getActivity(), "prenotazioniDocente");
         try {
             String data = "course=" + URLEncoder.encode(lesson.getCourse().getName(), "UTF-8") + "&teacherId=" + URLEncoder.encode(String.valueOf(lesson.getTeacher().getId()), "UTF-8") + "&teacherId=" + URLEncoder.encode(String.valueOf(lesson.getTeacher().getId()), "UTF-8") + "&action=teacherBooking";
-            String url = "http://10.0.2.2:8080/ProgettoTWEB_war_exploded/Controller";
             String method = "GET";
-            prenotazioniDocenteRequests.execute(data, url, method);
+            prenotazioniDocenteRequests.execute(data, Requests.url, method);
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
 
         Requests userBookingsRequests = new Requests(getActivity(), "userBookings");
         String data = "action=userBooking&isAndroid=true";
-        String url = "http://10.0.2.2:8080/ProgettoTWEB_war_exploded/Controller";
         String method = "GET";
-        userBookingsRequests.execute(data, url, method);
+        userBookingsRequests.execute(data, Requests.url, method);
 
         new Task(this, root).execute(prenotazioniDocenteRequests, userBookingsRequests);
     }
@@ -242,7 +240,7 @@ public class BookingFragment extends Fragment implements View.OnClickListener {
     private void updateBookings(int start, int end) {
         for (int i = 5; i < 10; i++) {
             week.get(i).setBackgroundResource(R.drawable.green);
-            if (((MainActivity) requireActivity()).isLoggedIn())
+            if (bookingFragment.isAdded() && ((MainActivity) requireActivity()).isLoggedIn())
                 week.get(i).setOnClickListener(this);
             week.get(i).setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
         }
@@ -298,6 +296,7 @@ public class BookingFragment extends Fragment implements View.OnClickListener {
                 }
         }
 
+        if(userBookings != null)
         for (Booking booking : userBookings) {
             if (booking.getLessonSlot() >= start && booking.getLessonSlot() < end)
                 switch (booking.getLessonSlot() % 5) {
@@ -365,8 +364,10 @@ public class BookingFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        bookBtn.setOnClickListener(null);
-        bookBtn.setVisibility(View.GONE);
+        if (((MainActivity) requireActivity()).isLoggedIn() && bookBtn != null) {
+            bookBtn.setOnClickListener(null);
+            bookBtn.setVisibility(View.GONE);
+        }
     }
 
 
