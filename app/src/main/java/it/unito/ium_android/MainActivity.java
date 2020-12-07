@@ -1,25 +1,35 @@
 package it.unito.ium_android;
 
 import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.Network;
+import android.net.NetworkRequest;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
 import com.google.android.material.navigation.NavigationView;
+
+import java.util.List;
 
 import it.unito.ium_android.requests.Requests;
 
@@ -28,6 +38,7 @@ public class MainActivity extends AppCompatActivity {
     private AppBarConfiguration mAppBarConfiguration;
     private boolean loggedIn = false;
 
+    //@RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -78,6 +89,8 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(getBaseContext(), "c'è bundle" + savedInstanceState.getInt("checkedItem") + " mentre id corrente è" + navigationView.getCheckedItem(),Toast.LENGTH_SHORT).show();
             }*/
 
+            //registerNetworkCallback();
+
             return true;
         });
     }
@@ -123,6 +136,53 @@ public class MainActivity extends AppCompatActivity {
     public boolean isLoggedIn() {
         return loggedIn;
     }
+/*
 
+    Documentation:
+    https://developer.android.com/reference/android/net/ConnectivityManager.NetworkCallback
+
+
+    // Network Check
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    public void registerNetworkCallback() {
+        ConnectivityManager connectivityManager = (ConnectivityManager) getBaseContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkRequest.Builder builder = new NetworkRequest.Builder();
+
+        connectivityManager.registerDefaultNetworkCallback(new ConnectivityManager.NetworkCallback() {
+                                                               @Override
+                                                               public void onAvailable(Network network) {
+                                                                   // Reload current fragment
+                                                                   /*Fragment frg = getVisibleFragment();
+                                                                   if(frg != null) {
+                                                                       final FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+                                                                       ft.detach(frg);
+                                                                       ft.attach(frg);
+                                                                       ft.commit();
+                                                                   }*/
+
+                                                                   /*Toast.makeText(getApplicationContext(), "onAvailable", Toast.LENGTH_SHORT).show();
+                                                                   Log.e("fds", "onAvailable");
+                                                               }
+
+                                                               @Override
+                                                               public void onLost(Network network) {
+                                                                   // Global Static Variable
+                                                                   Log.e("fds", "onLost");
+                                                               }
+                                                           }
+
+        );
+    }*/
+
+
+    private Fragment getVisibleFragment() {
+        FragmentManager fragmentManager = MainActivity.this.getSupportFragmentManager();
+        List<Fragment> fragments = fragmentManager.getFragments();
+        for (Fragment fragment : fragments) {
+            if (fragment != null && fragment.isVisible())
+                return fragment;
+        }
+        return null;
+    }
 
 }
