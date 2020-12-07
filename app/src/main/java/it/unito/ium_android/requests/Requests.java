@@ -148,7 +148,7 @@ public class Requests extends AsyncTask<String, String, String> {
                 prenotaLezioni(s);
                 break;
             case "logout":
-                logout();
+                logout("Logged out");;
                 break;
         }
 
@@ -205,19 +205,19 @@ public class Requests extends AsyncTask<String, String, String> {
         if (result.getMessage().equals("OK")) {
             Requests userBookingsRequests = new Requests(activity, "getUserBookings", view);
             String data = "action=userBooking&isAndroid=true";
-            String url = "http://192.168.1.102:8080/ProgettoTWEB_war_exploded/Controller";
+            String url = "http://10.0.2.2:8080/ProgettoTWEB_war_exploded/Controller";
             String method = "GET";
             userBookingsRequests.execute(data, url, method);
 
             Requests oldUserBookingsRequests = new Requests(activity, "oldUserBookings", view);
             data = "action=oldUserBookings";
-            url = "http://192.168.1.102:8080/ProgettoTWEB_war_exploded/Controller";
+            url = "http://10.0.2.2:8080/ProgettoTWEB_war_exploded/Controller";
             method = "GET";
             oldUserBookingsRequests.execute(data, url, method);
 
             new PrenotazioniFragment.Task(view, activity).execute(userBookingsRequests, oldUserBookingsRequests);
         } else if (result.getMessage().equals("Not logged in")) {
-            logout();
+            logout("Not logged in");
         } else {
             Toast.makeText(activity.getBaseContext(), result.getMessage(), Toast.LENGTH_SHORT).show();
         }
@@ -229,19 +229,19 @@ public class Requests extends AsyncTask<String, String, String> {
         if (result.getMessage().equals("OK")) {
             Requests userBookingsRequests = new Requests(activity, "getUserBookings", view);
             String data = "action=userBooking&isAndroid=true";
-            String url = "http://192.168.1.102:8080/ProgettoTWEB_war_exploded/Controller";
+            String url = "http://10.0.2.2:8080/ProgettoTWEB_war_exploded/Controller";
             String method = "GET";
             userBookingsRequests.execute(data, url, method);
 
             Requests oldUserBookingsRequests = new Requests(activity, "oldUserBookings", view);
             data = "action=oldUserBookings";
-            url = "http://192.168.1.102:8080/ProgettoTWEB_war_exploded/Controller";
+            url = "http://10.0.2.2:8080/ProgettoTWEB_war_exploded/Controller";
             method = "GET";
             oldUserBookingsRequests.execute(data, url, method);
 
             new PrenotazioniFragment.Task(view, activity).execute(userBookingsRequests, oldUserBookingsRequests);
         } else if (result.getMessage().equals("Not logged in")) {
-            logout();
+            logout("Not logged in");
         } else {
             Toast.makeText(activity.getBaseContext(), result.getMessage(), Toast.LENGTH_SHORT).show();
         }
@@ -253,18 +253,19 @@ public class Requests extends AsyncTask<String, String, String> {
         if (result.getMessage().equals("OK")) {
             Toast.makeText(activity.getBaseContext(), "Prenotazione effettuata", Toast.LENGTH_SHORT).show();
         } else if (result.getMessage().equals("Not logged in")) {
-            logout();
+            logout("Not logged in");
         } else {
             Toast.makeText(activity.getBaseContext(), result.getMessage(), Toast.LENGTH_SHORT).show();
         }
     }
 
-    private void logout() {
+    public void logout(String s) {
         ((MainActivity) activity).setLoggedIn(false);
         NavigationView navigationView = activity.findViewById(R.id.nav_view);
         Navigation.findNavController(activity, R.id.nav_host_fragment).popBackStack();
         navigationView.setCheckedItem(R.id.nav_prenota);
         Navigation.findNavController(activity, R.id.nav_host_fragment).navigate(R.id.nav_prenota);
+        Toast.makeText(activity.getBaseContext(), s, Toast.LENGTH_SHORT).show();
         navigationView.getMenu().findItem(R.id.nav_login).setVisible(true);
         navigationView.getMenu().findItem(R.id.nav_logout).setVisible(false);
         navigationView.getMenu().findItem(R.id.nav_prenotazioni).setVisible(false);

@@ -32,7 +32,7 @@ public class LoginFragment extends Fragment {
                 Requests post = new Requests(getActivity(), "login");
                 try {
                     String data = "username=" + URLEncoder.encode(username, "UTF-8") + "&password=" + URLEncoder.encode(password, "UTF-8") + "&action=login";
-                    String url = "http://192.168.1.102:8080/ProgettoTWEB_war_exploded/Controller";
+                    String url = "http://10.0.2.2:8080/ProgettoTWEB_war_exploded/Controller";
                     String method = "POST";
                     post.execute(data, url, method);
                 } catch (UnsupportedEncodingException e) {

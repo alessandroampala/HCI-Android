@@ -51,13 +51,13 @@ public class PrenotazioniFragment extends Fragment {
     private void makeRequests(View root) {
         Requests userBookingsRequests = new Requests(getActivity(), "getUserBookings", root);
         String data = "action=userBooking&isAndroid=true";
-        String url = "http://192.168.1.102:8080/ProgettoTWEB_war_exploded/Controller";
+        String url = "http://10.0.2.2:8080/ProgettoTWEB_war_exploded/Controller";
         String method = "GET";
         userBookingsRequests.execute(data, url, method);
 
         Requests oldUserBookingsRequests = new Requests(getActivity(), "oldUserBookings", root);
         data = "action=oldUserBookings";
-        url = "http://192.168.1.102:8080/ProgettoTWEB_war_exploded/Controller";
+        url = "http://10.0.2.2:8080/ProgettoTWEB_war_exploded/Controller";
         method = "GET";
         oldUserBookingsRequests.execute(data, url, method);
 
@@ -86,6 +86,9 @@ public class PrenotazioniFragment extends Fragment {
                 e.printStackTrace();
             }
 
+            if(result[0].getMessage().equals("Not logged in"))
+                requests[0].logout("Not logged in");
+
             try {
                 s = requests[1].get();
                 result[1] = new Gson().fromJson(s, new TypeToken<jsonMessage<List<Booking>>>() {
@@ -93,6 +96,9 @@ public class PrenotazioniFragment extends Fragment {
             } catch (ExecutionException | InterruptedException e) {
                 e.printStackTrace();
             }
+
+            if(result[1].getMessage().equals("Not logged in"))
+                requests[1].logout("Not logged in");
 
             return result;
         }
@@ -103,6 +109,9 @@ public class PrenotazioniFragment extends Fragment {
             RelativeLayout loadingLayout = this.view.findViewById(R.id.loadingPanel);
             RecyclerView cardsContainer = this.view.findViewById(R.id.cardsContainer);
             ConcatAdapter concatAdapter = new ConcatAdapter();
+
+            if(result[0].getMessage().equals("Not logged in") || result[1].getMessage().equals("Not logged in"))
+                return;
 
             if (result[0].getMessage().equals("OK"))
                 lessonsArchive(result[0].getData(), concatAdapter);

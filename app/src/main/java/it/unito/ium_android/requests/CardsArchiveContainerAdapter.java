@@ -46,7 +46,7 @@ public class CardsArchiveContainerAdapter extends RecyclerView.Adapter<CardsArch
                 Requests requests = new Requests((Activity) v.getContext(), "disdici", v.getRootView());
                 try {
                     String data = "lessonSlot=" + URLEncoder.encode(String.valueOf(booking.getLessonSlot()), "UTF-8") + "&course=" + URLEncoder.encode(booking.getCourse(), "UTF-8") + "&teacherId=" + URLEncoder.encode(String.valueOf(booking.getTeacher().getId()), "UTF-8") + "&action=disdici";
-                    String url = "http://192.168.1.102:8080/ProgettoTWEB_war_exploded/Controller";
+                    String url = "http://10.0.2.2:8080/ProgettoTWEB_war_exploded/Controller";
                     String method = "POST";
                     requests.execute(data, url, method);
                 } catch (UnsupportedEncodingException e) {
@@ -57,7 +57,7 @@ public class CardsArchiveContainerAdapter extends RecyclerView.Adapter<CardsArch
                 Requests requests = new Requests((Activity) v.getContext(), "svolta", v.getRootView());
                 try {
                     String data = "lessonSlot=" + URLEncoder.encode(String.valueOf(booking.getLessonSlot()), "UTF-8") + "&course=" + URLEncoder.encode(booking.getCourse(), "UTF-8") + "&teacherId=" + URLEncoder.encode(String.valueOf(booking.getTeacher().getId()), "UTF-8") + "&action=effettuata";
-                    String url = "http://192.168.1.102:8080/ProgettoTWEB_war_exploded/Controller";
+                    String url = "http://10.0.2.2:8080/ProgettoTWEB_war_exploded/Controller";
                     String method = "POST";
                     requests.execute(data, url, method);
                 } catch (UnsupportedEncodingException e) {

@@ -62,7 +62,7 @@ public class BookingFragment extends Fragment implements View.OnClickListener {
                 Requests prenotaLezioni = new Requests(getActivity(), "prenotaLezioni");
                 try {
                     String data = "course=" + URLEncoder.encode(lesson.getCourse().getName(), "UTF-8") + "&teacherId=" + URLEncoder.encode(String.valueOf(lesson.getTeacher().getId()), "UTF-8") + "&lessonSlots=" + URLEncoder.encode(recordBookings.toString(), "UTF-8") + "&action=prenotaLezioni";
-                    String url = "http://192.168.1.102:8080/ProgettoTWEB_war_exploded/Controller";
+                    String url = "http://10.0.2.2:8080/ProgettoTWEB_war_exploded/Controller";
                     String method = "POST";
                     prenotaLezioni.execute(data, url, method);
                 } catch (UnsupportedEncodingException e) {
@@ -107,7 +107,7 @@ public class BookingFragment extends Fragment implements View.OnClickListener {
         Requests prenotazioniDocenteRequests = new Requests(getActivity(), "prenotazioniDocente");
         try {
             String data = "course=" + URLEncoder.encode(lesson.getCourse().getName(), "UTF-8") + "&teacherId=" + URLEncoder.encode(String.valueOf(lesson.getTeacher().getId()), "UTF-8") + "&teacherId=" + URLEncoder.encode(String.valueOf(lesson.getTeacher().getId()), "UTF-8") + "&action=teacherBooking";
-            String url = "http://192.168.1.102:8080/ProgettoTWEB_war_exploded/Controller";
+            String url = "http://10.0.2.2:8080/ProgettoTWEB_war_exploded/Controller";
             String method = "GET";
             prenotazioniDocenteRequests.execute(data, url, method);
         } catch (UnsupportedEncodingException e) {
@@ -116,7 +116,7 @@ public class BookingFragment extends Fragment implements View.OnClickListener {
 
         Requests userBookingsRequests = new Requests(getActivity(), "userBookings");
         String data = "action=userBooking&isAndroid=true";
-        String url = "http://192.168.1.102:8080/ProgettoTWEB_war_exploded/Controller";
+        String url = "http://10.0.2.2:8080/ProgettoTWEB_war_exploded/Controller";
         String method = "GET";
         userBookingsRequests.execute(data, url, method);
 
