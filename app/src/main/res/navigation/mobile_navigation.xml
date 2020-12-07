@@ -5,13 +5,6 @@
     android:id="@+id/mobile_navigation"
     app:startDestination="@+id/nav_prenota">
 
-    <action
-        android:id="@+id/action_signInFragment_to_usersFragment"
-        app:destination="@id/nav_prenota"
-        app:launchSingleTop="true"
-        app:popUpTo="@+id/drawer_layout"
-        app:popUpToInclusive="true" />
-
     <fragment
         android:id="@+id/nav_prenota"
         android:name="it.unito.ium_android.ui.prenota.PrenotaFragment"

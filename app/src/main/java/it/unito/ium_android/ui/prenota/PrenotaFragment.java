@@ -101,22 +101,25 @@ public class PrenotaFragment extends Fragment {
     private void makeRequests(View root) {
         Requests teacherRequests = new Requests(getActivity(), "docenti", root);
 
-        String data = "action=teachers";
+        String data = "action=docenti";
+        String url = "http://192.168.1.102:8080/ProgettoTWEB_war_exploded/Controller";
         String method = "GET";
-        teacherRequests.execute(data, Requests.url, method);
+        teacherRequests.execute(data, url, method);
 
         Requests courseRequests = new Requests(getActivity(), "materie", root);
 
-        data = "action=courses";
+        data = "action=materie";
+        url = "http://192.168.1.102:8080/ProgettoTWEB_war_exploded/Controller";
         method = "GET";
 
-        courseRequests.execute(data, Requests.url, method);
+        courseRequests.execute(data, url, method);
 
         Requests lessonRequests = new Requests(getActivity(), "lessons", root);
         try {
             data = "course=" + URLEncoder.encode(materia, "UTF-8") + "&teacherId=" + URLEncoder.encode(docente, "UTF-8") + "&action=lessons";
+            url = "http://192.168.1.102:8080/ProgettoTWEB_war_exploded/Controller";
             method = "POST";
-            lessonRequests.execute(data, Requests.url, method);
+            lessonRequests.execute(data, url, method);
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
@@ -128,8 +131,9 @@ public class PrenotaFragment extends Fragment {
         Requests request = new Requests(getActivity(), "lessons", root);
         try {
             String data = "course=" + URLEncoder.encode(materia, "UTF-8") + "&teacherId=" + URLEncoder.encode(docente, "UTF-8") + "&action=lessons";
+            String url = "http://192.168.1.102:8080/ProgettoTWEB_war_exploded/Controller";
             String method = "POST";
-            request.execute(data, Requests.url, method);
+            request.execute(data, url, method);
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }

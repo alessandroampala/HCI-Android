@@ -1,19 +1,11 @@
 package it.unito.ium_android;
 
-import android.content.Context;
 import android.os.Bundle;
-import android.os.Parcelable;
-import android.util.AttributeSet;
-import android.view.View;
-import android.widget.Toast;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -23,10 +15,10 @@ import com.google.android.material.navigation.NavigationView;
 
 import it.unito.ium_android.requests.Requests;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity{
 
     private AppBarConfiguration mAppBarConfiguration;
-    private boolean loggedIn = false;
+    private boolean loggedIn=false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,53 +38,35 @@ public class MainActivity extends AppCompatActivity {
         navigationView.setCheckedItem(R.id.nav_prenota);
         navigationView.setNavigationItemSelectedListener(menuItem -> {
             int id = menuItem.getItemId();
-            switch (id) {
+            switch (id){
                 case R.id.nav_prenota:
+                    navController.popBackStack();
+                    navigationView.setCheckedItem(R.id.nav_prenota);
                     navController.navigate(R.id.nav_prenota);
                     break;
                 case R.id.nav_prenotazioni:
+                    navController.popBackStack();
+                    navigationView.setCheckedItem(R.id.nav_prenotazioni);
                     navController.navigate(R.id.nav_prenotazioni);
                     break;
                 case R.id.nav_login:
+                    navController.popBackStack();
+                    navigationView.setCheckedItem(R.id.nav_login);
                     navController.navigate(R.id.nav_login);
                     break;
                 case R.id.nav_logout:
                     Requests requests = new Requests(MainActivity.this, "logout");
                     String data = "action=logout";
+                    String url = "http://192.168.1.102:8080/ProgettoTWEB_war_exploded/Controller";
                     String method = "POST";
-                    requests.execute(data, Requests.url, method);
+                    requests.execute(data, url, method);
                     break;
             }
 
             drawer.closeDrawer(GravityCompat.START);
-
-            /*if (savedInstanceState != null) {
-                //Restore the fragment's instance
-                navigationView.setCheckedItem(savedInstanceState.getInt("checkedItem"));
-                Toast.makeText(getBaseContext(), "c'è bundle" + savedInstanceState.getInt("checkedItem") + " mentre id corrente è" + navigationView.getCheckedItem(),Toast.LENGTH_SHORT).show();
-            }*/
-
             return true;
         });
     }
-
-    /*@Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        //Save the fragment's instance
-        Fragment f;
-        if (getSupportFragmentManager().getBackStackEntryCount() == 0)
-            f = getSupportFragmentManager().getFragments().get(0);
-        else
-            f = getSupportFragmentManager().getFragments().get(getSupportFragmentManager().getBackStackEntryCount() - 1);
-        getSupportFragmentManager().putFragment(outState, "myFragmentName", f);
-
-        NavigationView navigationView = findViewById(R.id.nav_view);
-        //navigationView.getCheckedItem();
-        outState.putInt("checkedItem", navigationView.getCheckedItem().getItemId());
-        Toast.makeText(getBaseContext(), "sto salvando " + navigationView.getCheckedItem() + "con itemid" + navigationView.getCheckedItem().getItemId(),Toast.LENGTH_SHORT).show();
-
-    }*/
 
     @Override
     public boolean onSupportNavigateUp() {
@@ -106,8 +80,9 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
         Requests requests = new Requests(this, "getSessionLogin");
         String data = "action=getSessionLogin";
+        String url = "http://192.168.1.102:8080/ProgettoTWEB_war_exploded/Controller";
         String method = "POST";
-        requests.execute(data, Requests.url, method);
+        requests.execute(data, url, method);
     }
 
     public void setLoggedIn(boolean loggedIn) {
@@ -117,6 +92,4 @@ public class MainActivity extends AppCompatActivity {
     public boolean isLoggedIn() {
         return loggedIn;
     }
-
-
 }
