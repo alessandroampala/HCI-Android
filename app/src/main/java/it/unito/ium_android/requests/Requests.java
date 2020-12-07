@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
+import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
@@ -21,6 +22,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.ProtocolException;
+import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.util.List;
 
@@ -65,14 +67,13 @@ public class Requests extends AsyncTask<String, String, String> {
             e.printStackTrace();
         } catch (NullPointerException e) {
             e.printStackTrace();
-            return null;
         }
         connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded; utf-8");
         connection.setRequestProperty("Content-Length", String.valueOf(strings[0].length()));
         if (this.className.equals("getSessionLogin") || this.className.equals("getUserBookings") || this.className.equals("oldUserBookings") || this.className.equals("cancelBooking") || this.className.equals("markBooking") || this.className.equals("logout") || this.className.equals("prenotazioniDocente") || this.className.equals("userBookings") || this.className.equals("bookLessons")) {
             SharedPreferences sharedPref = this.activity.getPreferences(Context.MODE_PRIVATE);
             String sessionId = "";
-            if (sharedPref!=null && sharedPref.contains("sessionId"))
+            if (sharedPref != null && sharedPref.contains("sessionId"))
                 sessionId = sharedPref.getString("sessionId", "");
             else
                 sessionId = "";
@@ -80,6 +81,14 @@ public class Requests extends AsyncTask<String, String, String> {
         }
         connection.setDoInput(true);
         connection.setDoOutput(true);
+        connection.setConnectTimeout(500);
+        try {
+            connection.connect();
+        } catch (SocketTimeoutException e){
+            return null;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         DataOutputStream out;
         try {
@@ -205,6 +214,7 @@ public class Requests extends AsyncTask<String, String, String> {
             navigationView.getMenu().findItem(R.id.nav_login).setVisible(true);
             navigationView.getMenu().findItem(R.id.nav_logout).setVisible(false);
             navigationView.getMenu().findItem(R.id.nav_prenotazioni).setVisible(false);
+            Toast.makeText(activity.getBaseContext(), "Not logged in", Toast.LENGTH_SHORT).show();
             ((MainActivity) activity).setLoggedIn(false);
         }
     }

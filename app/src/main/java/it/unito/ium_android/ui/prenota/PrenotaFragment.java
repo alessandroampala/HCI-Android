@@ -3,6 +3,7 @@ package it.unito.ium_android.ui.prenota;
 import android.app.Activity;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,18 +12,22 @@ import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+
 import it.unito.ium_android.MainActivity;
 import it.unito.ium_android.R;
 import it.unito.ium_android.requests.CardsContainerAdapter;
@@ -157,25 +162,25 @@ public class PrenotaFragment extends Fragment {
             ArrayList<String> s = new ArrayList<>();
             if (requests.length > 1) {
                 try {
-                    s.add( requests[0].get());
+                    s.add(requests[0].get());
                 } catch (ExecutionException | InterruptedException e) {
                     e.printStackTrace();
                 }
 
                 try {
-                    s.add( requests[1].get());
+                    s.add(requests[1].get());
                 } catch (ExecutionException | InterruptedException e) {
                     e.printStackTrace();
                 }
 
                 try {
-                    s.add( requests[2].get());
+                    s.add(requests[2].get());
                 } catch (ExecutionException | InterruptedException e) {
                     e.printStackTrace();
                 }
             } else {
                 try {
-                    s.add( requests[0].get());
+                    s.add(requests[0].get());
                 } catch (ExecutionException | InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -188,10 +193,18 @@ public class PrenotaFragment extends Fragment {
         protected void onPostExecute(ArrayList<String> s) {
             super.onPostExecute(s);
             if (s.size() > 1) {
+                if (s.get(0) == null || s.get(1) == null || s.get(2) == null) {
+                    Toast.makeText(activity.getBaseContext(), "Connection error", Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 docenti(s.get(0));
                 materie(s.get(1));
                 lessons(s.get(2));
             } else {
+                if (s.get(0) == null) {
+                    Toast.makeText(activity.getBaseContext(), "Connection error", Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 lessons(s.get(0));
             }
         }

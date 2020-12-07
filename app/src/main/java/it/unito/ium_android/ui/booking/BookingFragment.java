@@ -12,9 +12,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.Navigation;
 
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.navigation.NavigationView;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -41,6 +44,8 @@ public class BookingFragment extends Fragment implements View.OnClickListener {
     private Integer weekPosition = 0;
     private MaterialButton bookBtn;
     private BookingFragment bookingFragment;
+    private DrawerLayout drawerLayout;
+
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -50,6 +55,9 @@ public class BookingFragment extends Fragment implements View.OnClickListener {
         bookBtn = requireActivity().findViewById(R.id.bookButton);
         recordBookings = new ArrayList<>();
         bookingFragment = this;
+        drawerLayout = getActivity().findViewById(R.id.drawer_layout);
+
+        drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
 
         if (bookingFragment.isAdded() && ((MainActivity) requireActivity()).isLoggedIn()) {
             bookBtn.setVisibility(View.VISIBLE);
@@ -296,52 +304,52 @@ public class BookingFragment extends Fragment implements View.OnClickListener {
                 }
         }
 
-        if(userBookings != null)
-        for (Booking booking : userBookings) {
-            if (booking.getLessonSlot() >= start && booking.getLessonSlot() < end)
-                switch (booking.getLessonSlot() % 5) {
-                    case 0:
-                        if (booking.getCourse().equals(lesson.getCourse().getName()) && week.get(5).getBackground().getConstantState().equals(getResources().getDrawable(R.drawable.red).getConstantState()))
-                            week.get(5).setBackgroundResource(R.drawable.blue);
-                        else
-                            week.get(5).setBackgroundResource(R.drawable.red);
-                        week.get(5).setOnClickListener(null);
-                        week.get(5).setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_baseline_check_box_24, 0, 0);
-                        break;
-                    case 1:
-                        if (booking.getCourse().equals(lesson.getCourse().getName()) && week.get(6).getBackground().getConstantState().equals(getResources().getDrawable(R.drawable.red).getConstantState()))
-                            week.get(6).setBackgroundResource(R.drawable.blue);
-                        else
-                            week.get(6).setBackgroundResource(R.drawable.red);
-                        week.get(6).setOnClickListener(null);
-                        week.get(6).setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_baseline_check_box_24, 0, 0);
-                        break;
-                    case 2:
-                        if (booking.getCourse().equals(lesson.getCourse().getName()) && week.get(7).getBackground().getConstantState().equals(getResources().getDrawable(R.drawable.red).getConstantState()))
-                            week.get(7).setBackgroundResource(R.drawable.blue);
-                        else
-                            week.get(7).setBackgroundResource(R.drawable.red);
-                        week.get(7).setOnClickListener(null);
-                        week.get(7).setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_baseline_check_box_24, 0, 0);
-                        break;
-                    case 3:
-                        if (booking.getCourse().equals(lesson.getCourse().getName()) && week.get(8).getBackground().getConstantState().equals(getResources().getDrawable(R.drawable.red).getConstantState()))
-                            week.get(8).setBackgroundResource(R.drawable.blue);
-                        else
-                            week.get(8).setBackgroundResource(R.drawable.red);
-                        week.get(8).setOnClickListener(null);
-                        week.get(8).setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_baseline_check_box_24, 0, 0);
-                        break;
-                    case 4:
-                        if (booking.getCourse().equals(lesson.getCourse().getName()) && week.get(9).getBackground().getConstantState().equals(getResources().getDrawable(R.drawable.red).getConstantState()))
-                            week.get(9).setBackgroundResource(R.drawable.blue);
-                        else
-                            week.get(9).setBackgroundResource(R.drawable.red);
-                        week.get(9).setOnClickListener(null);
-                        week.get(9).setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_baseline_check_box_24, 0, 0);
-                        break;
-                }
-        }
+        if (userBookings != null)
+            for (Booking booking : userBookings) {
+                if (booking.getLessonSlot() >= start && booking.getLessonSlot() < end)
+                    switch (booking.getLessonSlot() % 5) {
+                        case 0:
+                            if (booking.getCourse().equals(lesson.getCourse().getName()) && week.get(5).getBackground().getConstantState().equals(getResources().getDrawable(R.drawable.red).getConstantState()))
+                                week.get(5).setBackgroundResource(R.drawable.blue);
+                            else
+                                week.get(5).setBackgroundResource(R.drawable.red);
+                            week.get(5).setOnClickListener(null);
+                            week.get(5).setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_baseline_check_box_24, 0, 0);
+                            break;
+                        case 1:
+                            if (booking.getCourse().equals(lesson.getCourse().getName()) && week.get(6).getBackground().getConstantState().equals(getResources().getDrawable(R.drawable.red).getConstantState()))
+                                week.get(6).setBackgroundResource(R.drawable.blue);
+                            else
+                                week.get(6).setBackgroundResource(R.drawable.red);
+                            week.get(6).setOnClickListener(null);
+                            week.get(6).setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_baseline_check_box_24, 0, 0);
+                            break;
+                        case 2:
+                            if (booking.getCourse().equals(lesson.getCourse().getName()) && week.get(7).getBackground().getConstantState().equals(getResources().getDrawable(R.drawable.red).getConstantState()))
+                                week.get(7).setBackgroundResource(R.drawable.blue);
+                            else
+                                week.get(7).setBackgroundResource(R.drawable.red);
+                            week.get(7).setOnClickListener(null);
+                            week.get(7).setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_baseline_check_box_24, 0, 0);
+                            break;
+                        case 3:
+                            if (booking.getCourse().equals(lesson.getCourse().getName()) && week.get(8).getBackground().getConstantState().equals(getResources().getDrawable(R.drawable.red).getConstantState()))
+                                week.get(8).setBackgroundResource(R.drawable.blue);
+                            else
+                                week.get(8).setBackgroundResource(R.drawable.red);
+                            week.get(8).setOnClickListener(null);
+                            week.get(8).setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_baseline_check_box_24, 0, 0);
+                            break;
+                        case 4:
+                            if (booking.getCourse().equals(lesson.getCourse().getName()) && week.get(9).getBackground().getConstantState().equals(getResources().getDrawable(R.drawable.red).getConstantState()))
+                                week.get(9).setBackgroundResource(R.drawable.blue);
+                            else
+                                week.get(9).setBackgroundResource(R.drawable.red);
+                            week.get(9).setOnClickListener(null);
+                            week.get(9).setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_baseline_check_box_24, 0, 0);
+                            break;
+                    }
+            }
     }
 
     private Integer lessonSlot(TextView v) {
@@ -364,10 +372,13 @@ public class BookingFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if (bookingFragment.isAdded() && ((MainActivity) requireActivity()).isLoggedIn()) {
-            bookBtn.setOnClickListener(null);
-            bookBtn.setVisibility(View.GONE);
-        }
+        bookBtn.setOnClickListener(null);
+        bookBtn.setVisibility(View.GONE);
+        Requests requests = new Requests(getActivity(), "getSessionLogin");
+        String data = "action=getSessionLogin";
+        String method = "POST";
+        requests.execute(data, Requests.url, method);
+        drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
     }
 
 
