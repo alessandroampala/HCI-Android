@@ -240,10 +240,8 @@ public class BookingFragment extends Fragment implements View.OnClickListener {
     }
 
     private void restoreBookings(TextView textView) {
-        if (recordBookings.contains(lessonSlot(textView))) {
-            textView.setBackgroundResource(R.drawable.dark_green);
-            textView.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_baseline_check_24, 0, 0);
-        }
+        textView.setBackgroundResource(R.drawable.dark_green);
+        textView.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_baseline_check_24, 0, 0);
     }
 
     private void setBookings(List<Booking> userBookings, List<Booking> teacherBookings) {
