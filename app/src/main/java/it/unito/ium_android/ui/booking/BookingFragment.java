@@ -45,6 +45,7 @@ public class BookingFragment extends Fragment implements View.OnClickListener {
     private MaterialButton bookBtn;
     private BookingFragment bookingFragment;
     private DrawerLayout drawerLayout;
+    private Integer removeRecordBooking;
 
 
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -222,22 +223,32 @@ public class BookingFragment extends Fragment implements View.OnClickListener {
                 break;
             default:
                 markBooking((TextView) v);
+                if (removeRecordBooking != null) {
+                    recordBookings.remove(removeRecordBooking);
+                    removeRecordBooking = null;
+                }
                 break;
         }
     }
 
     private void markBooking(TextView textView) {
-        if (textView.getBackground().getConstantState().equals(getResources().getDrawable(R.drawable.green).getConstantState())) {
+        if (!recordBookings.contains(lessonSlot(textView))) {
             textView.setBackgroundResource(R.drawable.dark_green);
             textView.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_baseline_check_24, 0, 0);
-            if (!recordBookings.contains(lessonSlot(textView)))
-                recordBookings.add(lessonSlot(textView));
-        } else if (textView.getBackground().getConstantState().equals(getResources().getDrawable(R.drawable.dark_green).getConstantState())) {
+            recordBookings.add(lessonSlot(textView));
+        } else if (recordBookings.contains(lessonSlot(textView))) {
             textView.setBackgroundResource(R.drawable.green);
             textView.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
-            recordBookings.remove(lessonSlot(textView));
+            removeRecordBooking = lessonSlot(textView);
         }
 
+    }
+
+    private void restoreBookings(TextView textView) {
+        if (recordBookings.contains(lessonSlot(textView))) {
+            textView.setBackgroundResource(R.drawable.dark_green);
+            textView.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_baseline_check_24, 0, 0);
+        }
     }
 
     private void setBookings(List<Booking> userBookings, List<Booking> teacherBookings) {
@@ -261,19 +272,19 @@ public class BookingFragment extends Fragment implements View.OnClickListener {
             if (booking >= start && booking < end)
                 switch (booking % 5) {
                     case 0:
-                        markBooking(week.get(5));
+                        restoreBookings(week.get(5));
                         break;
                     case 1:
-                        markBooking(week.get(6));
+                        restoreBookings(week.get(6));
                         break;
                     case 2:
-                        markBooking(week.get(7));
+                        restoreBookings(week.get(7));
                         break;
                     case 3:
-                        markBooking(week.get(8));
+                        restoreBookings(week.get(8));
                         break;
                     case 4:
-                        markBooking(week.get(9));
+                        restoreBookings(week.get(9));
                         break;
                 }
         }
@@ -374,10 +385,12 @@ public class BookingFragment extends Fragment implements View.OnClickListener {
         super.onDestroy();
         bookBtn.setOnClickListener(null);
         bookBtn.setVisibility(View.GONE);
-        Requests requests = new Requests(getActivity(), "getSessionLogin");
-        String data = "action=getSessionLogin";
-        String method = "POST";
-        requests.execute(data, Requests.url, method);
+        if (bookingFragment.isAdded() && ((MainActivity) requireActivity()).isLoggedIn()) {
+            Requests requests = new Requests(getActivity(), "getSessionLogin");
+            String data = "action=getSessionLogin";
+            String method = "POST";
+            requests.execute(data, Requests.url, method);
+        }
         drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
     }
 
