@@ -1,5 +1,6 @@
 package it.unito.ium_android.requests;
 
+// Enum that refers the status of the booking
 public enum Status {
     ACTIVE,
     DONE,

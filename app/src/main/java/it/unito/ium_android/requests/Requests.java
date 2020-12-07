@@ -30,6 +30,7 @@ import it.unito.ium_android.MainActivity;
 import it.unito.ium_android.R;
 import it.unito.ium_android.ui.prenotazioni.PrenotazioniFragment;
 
+// Class used to make requests to the servlet
 public class Requests extends AsyncTask<String, String, String> {
     private final Activity activity;
     private final String className;
@@ -37,18 +38,21 @@ public class Requests extends AsyncTask<String, String, String> {
     public final static String url = "http://10.0.2.2:8080/ProgettoTWEB_war_exploded/Controller";
     //public final static String url = "http://192.168.1.111:8080/ProgettoTWEB_war_exploded/Controller";
 
+    // Constructor
     public Requests(Activity activity, String className) {
         this.activity = activity;
         this.className = className;
         this.view = null;
     }
 
+    // Constructor
     public Requests(Activity activity, String className, View view) {
         this.activity = activity;
         this.className = className;
         this.view = view;
     }
 
+    // Execute this method in background and make a request to the servlet
     @Override
     protected String doInBackground(String... strings) {
         StringBuilder concatStrings = new StringBuilder();
@@ -128,6 +132,10 @@ public class Requests extends AsyncTask<String, String, String> {
         return concatStrings.toString();
     }
 
+    /*
+    * Method called when the method above finish
+    * s -> data returned from the requests
+     */
     @Override
     protected void onPostExecute(String s) {
         super.onPostExecute(s);
@@ -160,6 +168,7 @@ public class Requests extends AsyncTask<String, String, String> {
 
     }
 
+    // Checks data from the login requests
     private void login(String s) {
         jsonMessage<User> result = new Gson().fromJson(s, new TypeToken<jsonMessage<User>>() {
         }.getType());
@@ -187,6 +196,7 @@ public class Requests extends AsyncTask<String, String, String> {
         }
     }
 
+    // Hide keyboard after successful login
     private void hideKeyboard(Activity activity) {
         InputMethodManager imm = (InputMethodManager) activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
         //Find the currently focused view, so we can grab the correct window token from it
@@ -198,6 +208,7 @@ public class Requests extends AsyncTask<String, String, String> {
         imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 
+    // Checks data from the sessionCheck requests
     private void sessionCheck(String s) {
         jsonMessage<User> result = new Gson().fromJson(s, new TypeToken<jsonMessage<User>>() {
         }.getType());
@@ -219,6 +230,7 @@ public class Requests extends AsyncTask<String, String, String> {
         }
     }
 
+    // Checks data from the cancelBooking requests
     private void cancelBooking(String s) {
         jsonMessage<List<Object>> result = new Gson().fromJson(s, new TypeToken<jsonMessage<List<Object>>>() {
         }.getType());
@@ -241,6 +253,7 @@ public class Requests extends AsyncTask<String, String, String> {
         }
     }
 
+    // Checks data from the markBooking requests
     private void markBooking(String s) {
         jsonMessage<List<Object>> result = new Gson().fromJson(s, new TypeToken<jsonMessage<List<Object>>>() {
         }.getType());
@@ -263,6 +276,7 @@ public class Requests extends AsyncTask<String, String, String> {
         }
     }
 
+    // Checks data from the bookLessons requests
     private void bookLessons(String s) {
         jsonMessage<List<Object>> result = new Gson().fromJson(s, new TypeToken<jsonMessage<List<Object>>>() {
         }.getType());
@@ -275,6 +289,7 @@ public class Requests extends AsyncTask<String, String, String> {
         }
     }
 
+    // Checks data from the logout requests
     public void logout(String s) {
         ((MainActivity) activity).setLoggedIn(false);
         NavigationView navigationView = activity.findViewById(R.id.nav_view);

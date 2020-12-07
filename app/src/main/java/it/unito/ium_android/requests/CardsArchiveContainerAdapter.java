@@ -18,14 +18,17 @@ import java.util.List;
 
 import it.unito.ium_android.R;
 
+// Class for the adapter for prenotazioni fragment cards
 public class CardsArchiveContainerAdapter extends RecyclerView.Adapter<CardsArchiveContainerAdapter.CardsContainerViewHolder> {
 
     private final List<Booking> data;
 
+    // Constructor
     public CardsArchiveContainerAdapter(List<Booking> data) {
         this.data = data;
     }
 
+    // Inflates layout during the creation of the view holder for the cards
     @NonNull
     @Override
     public CardsArchiveContainerAdapter.CardsContainerViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -33,6 +36,7 @@ public class CardsArchiveContainerAdapter extends RecyclerView.Adapter<CardsArch
         return new CardsContainerViewHolder(view);
     }
 
+    // Populates the cards with the data and bind it
     @Override
     public void onBindViewHolder(@NonNull CardsArchiveContainerAdapter.CardsContainerViewHolder holder, int position) {
         Booking booking = this.data.get(position);
@@ -68,18 +72,20 @@ public class CardsArchiveContainerAdapter extends RecyclerView.Adapter<CardsArch
         }
     }
 
+    // Returns the number of lessons in Prenotazioni fragment
     @Override
     public int getItemCount() {
         return data.size();
     }
 
-
+    // Class for the view holder
     public static class CardsContainerViewHolder extends RecyclerView.ViewHolder {
 
         TextView materia, docente, data, status;
         MaterialButton disdici, svolta;
         LinearLayout buttons;
 
+        // Constructor
         public CardsContainerViewHolder(@NonNull View itemView) {
             super(itemView);
 
@@ -93,6 +99,7 @@ public class CardsArchiveContainerAdapter extends RecyclerView.Adapter<CardsArch
         }
     }
 
+    // Transform lessonSlot to string
     private String lessonSlotToString(int lessonSlot) {
         String day = "";
         switch ((int) Math.floor(lessonSlot / 5)) {

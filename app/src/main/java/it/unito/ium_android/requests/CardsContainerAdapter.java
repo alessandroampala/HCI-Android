@@ -5,24 +5,31 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.RecyclerView;
+
 import com.google.android.material.button.MaterialButton;
+
 import java.util.List;
+
 import it.unito.ium_android.MainActivity;
 import it.unito.ium_android.R;
 
+// Class for the adapter for prenota fragment cards
 public class CardsContainerAdapter extends RecyclerView.Adapter<CardsContainerAdapter.CardsContainerViewHolder> {
 
     private final List<Lesson> data;
     private final MainActivity activity;
 
+    // Constructor
     public CardsContainerAdapter(List<Lesson> data, MainActivity activity) {
         this.data = data;
         this.activity = activity;
     }
 
+    // Inflates layout during the creation of the view holder for the cards
     @NonNull
     @Override
     public CardsContainerAdapter.CardsContainerViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -30,6 +37,7 @@ public class CardsContainerAdapter extends RecyclerView.Adapter<CardsContainerAd
         return new CardsContainerViewHolder(view);
     }
 
+    // Populates the cards with the data and bind it
     @Override
     public void onBindViewHolder(@NonNull CardsContainerAdapter.CardsContainerViewHolder holder, int position) {
         Lesson lesson = this.data.get(position);
@@ -43,17 +51,19 @@ public class CardsContainerAdapter extends RecyclerView.Adapter<CardsContainerAd
         });
     }
 
+    // Returns the number of lessons in Prenota fragment
     @Override
     public int getItemCount() {
         return data.size();
     }
 
-
+    // Class for the view holder
     public static class CardsContainerViewHolder extends RecyclerView.ViewHolder {
 
         TextView materia, docente;
         MaterialButton prenota;
 
+        // Constructor
         public CardsContainerViewHolder(@NonNull View itemView) {
             super(itemView);
 
