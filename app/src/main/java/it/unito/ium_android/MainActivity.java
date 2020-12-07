@@ -1,8 +1,13 @@
 package it.unito.ium_android;
 
+import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.Network;
+import android.net.NetworkInfo;
 import android.net.NetworkRequest;
 import android.os.Build;
 import android.os.Bundle;
@@ -38,7 +43,6 @@ public class MainActivity extends AppCompatActivity {
     private AppBarConfiguration mAppBarConfiguration;
     private boolean loggedIn = false;
 
-    //@RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,6 +51,26 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         NavigationView navigationView = findViewById(R.id.nav_view);
+
+        BroadcastReceiver connectivityReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                ConnectivityManager cm =
+                        (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+
+                NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+                boolean isConnected = activeNetwork != null &&
+                        activeNetwork.isConnectedOrConnecting();
+                if (isConnected) {
+                    Navigation.findNavController((Activity) context, R.id.nav_host_fragment).popBackStack();
+                    navigationView.setCheckedItem(R.id.nav_prenota);
+                    Navigation.findNavController((Activity) context, R.id.nav_host_fragment).navigate(R.id.nav_prenota);
+                }
+            }
+        };
+
+        IntentFilter intentFilter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
+        registerReceiver(connectivityReceiver, intentFilter);
 
         mAppBarConfiguration = new AppBarConfiguration.Builder(
                 R.id.nav_login, R.id.nav_prenota, R.id.nav_prenotazioni, R.id.nav_logout)
@@ -83,35 +107,9 @@ public class MainActivity extends AppCompatActivity {
 
             drawer.closeDrawer(GravityCompat.START);
 
-            /*if (savedInstanceState != null) {
-                //Restore the fragment's instance
-                navigationView.setCheckedItem(savedInstanceState.getInt("checkedItem"));
-                Toast.makeText(getBaseContext(), "c'è bundle" + savedInstanceState.getInt("checkedItem") + " mentre id corrente è" + navigationView.getCheckedItem(),Toast.LENGTH_SHORT).show();
-            }*/
-
-            //registerNetworkCallback();
-
             return true;
         });
     }
-
-    /*@Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        //Save the fragment's instance
-        Fragment f;
-        if (getSupportFragmentManager().getBackStackEntryCount() == 0)
-            f = getSupportFragmentManager().getFragments().get(0);
-        else
-            f = getSupportFragmentManager().getFragments().get(getSupportFragmentManager().getBackStackEntryCount() - 1);
-        getSupportFragmentManager().putFragment(outState, "myFragmentName", f);
-
-        NavigationView navigationView = findViewById(R.id.nav_view);
-        //navigationView.getCheckedItem();
-        outState.putInt("checkedItem", navigationView.getCheckedItem().getItemId());
-        Toast.makeText(getBaseContext(), "sto salvando " + navigationView.getCheckedItem() + "con itemid" + navigationView.getCheckedItem().getItemId(),Toast.LENGTH_SHORT).show();
-
-    }*/
 
     @Override
     public boolean onSupportNavigateUp() {
@@ -136,53 +134,4 @@ public class MainActivity extends AppCompatActivity {
     public boolean isLoggedIn() {
         return loggedIn;
     }
-/*
-
-    Documentation:
-    https://developer.android.com/reference/android/net/ConnectivityManager.NetworkCallback
-
-
-    // Network Check
-    @RequiresApi(api = Build.VERSION_CODES.N)
-    public void registerNetworkCallback() {
-        ConnectivityManager connectivityManager = (ConnectivityManager) getBaseContext().getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkRequest.Builder builder = new NetworkRequest.Builder();
-
-        connectivityManager.registerDefaultNetworkCallback(new ConnectivityManager.NetworkCallback() {
-                                                               @Override
-                                                               public void onAvailable(Network network) {
-                                                                   // Reload current fragment
-                                                                   /*Fragment frg = getVisibleFragment();
-                                                                   if(frg != null) {
-                                                                       final FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-                                                                       ft.detach(frg);
-                                                                       ft.attach(frg);
-                                                                       ft.commit();
-                                                                   }*/
-
-                                                                   /*Toast.makeText(getApplicationContext(), "onAvailable", Toast.LENGTH_SHORT).show();
-                                                                   Log.e("fds", "onAvailable");
-                                                               }
-
-                                                               @Override
-                                                               public void onLost(Network network) {
-                                                                   // Global Static Variable
-                                                                   Log.e("fds", "onLost");
-                                                               }
-                                                           }
-
-        );
-    }*/
-
-
-    private Fragment getVisibleFragment() {
-        FragmentManager fragmentManager = MainActivity.this.getSupportFragmentManager();
-        List<Fragment> fragments = fragmentManager.getFragments();
-        for (Fragment fragment : fragments) {
-            if (fragment != null && fragment.isVisible())
-                return fragment;
-        }
-        return null;
-    }
-
 }
