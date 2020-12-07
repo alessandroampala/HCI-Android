@@ -12,6 +12,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.ConcatAdapter;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -32,19 +33,19 @@ import it.unito.ium_android.requests.Requests;
 import it.unito.ium_android.requests.jsonMessage;
 
 public class PrenotazioniFragment extends Fragment {
+    public static PrenotazioniFragment instance; //singleton pattern
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_prenotazioni, container, false);
         SwipeRefreshLayout refreshPanel = root.findViewById(R.id.refreshPanel);
-
+        instance = this;
         makeRequests(root);
 
         refreshPanel.setOnRefreshListener(() -> {
             makeRequests(root);
             refreshPanel.setRefreshing(false);
         });
-
 
         return root;
     }
@@ -98,6 +99,12 @@ public class PrenotazioniFragment extends Fragment {
         @Override
         protected void onPostExecute(jsonMessage<List<Booking>>[] result) {
             super.onPostExecute(result);
+
+            if(result[0] == null) //there's no network
+            {
+                return;
+            }
+
             RelativeLayout loadingLayout = this.view.findViewById(R.id.loadingPanel);
             RecyclerView cardsContainer = this.view.findViewById(R.id.cardsContainer);
             ConcatAdapter concatAdapter = new ConcatAdapter();

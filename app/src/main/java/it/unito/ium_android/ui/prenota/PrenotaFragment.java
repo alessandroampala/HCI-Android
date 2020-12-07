@@ -192,6 +192,9 @@ public class PrenotaFragment extends Fragment {
         @Override
         protected void onPostExecute(ArrayList<String> s) {
             super.onPostExecute(s);
+
+            if(s == null) return;
+
             if (s.size() > 1) {
                 if (s.get(0) == null || s.get(1) == null || s.get(2) == null) {
                     Toast.makeText(activity.getBaseContext(), "Connection error", Toast.LENGTH_SHORT).show();

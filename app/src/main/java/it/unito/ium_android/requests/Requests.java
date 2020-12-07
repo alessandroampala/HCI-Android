@@ -3,6 +3,8 @@ package it.unito.ium_android.requests;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.view.View;
@@ -35,8 +37,10 @@ public class Requests extends AsyncTask<String, String, String> {
     private final Activity activity;
     private final String className;
     private final View view;
-    public final static String url = "http://10.0.2.2:8080/ProgettoTWEB_war_exploded/Controller";
-    //public final static String url = "http://192.168.1.111:8080/ProgettoTWEB_war_exploded/Controller";
+    private static Toast toast;
+    //public final static String url = "http://10.0.2.2:8080/ProgettoTWEB_war_exploded/Controller";
+    public final static String url = "http://192.168.1.111:8080/ProgettoTWEB_war_exploded/Controller";
+
 
     // Constructor
     public Requests(Activity activity, String className) {
@@ -55,8 +59,9 @@ public class Requests extends AsyncTask<String, String, String> {
     // Execute this method in background and make a request to the servlet
     @Override
     protected String doInBackground(String... strings) {
-        StringBuilder concatStrings = new StringBuilder();
+        if(!isConnected()) return null;
 
+        StringBuilder concatStrings = new StringBuilder();
         HttpURLConnection connection = null;
 
         try {
@@ -141,7 +146,7 @@ public class Requests extends AsyncTask<String, String, String> {
         super.onPostExecute(s);
 
         if (s == null) {
-            Toast.makeText(activity.getBaseContext(), "Connection error", Toast.LENGTH_SHORT).show();
+            showToast("Connection error");
             return;
         }
 
@@ -187,7 +192,7 @@ public class Requests extends AsyncTask<String, String, String> {
             hideKeyboard(activity);
             navigationView.setCheckedItem(R.id.nav_prenota);
         } else {
-            Toast.makeText(activity.getBaseContext(), result.getMessage(), Toast.LENGTH_SHORT).show();
+            showToast(result.getMessage());
             navigationView.getMenu().findItem(R.id.nav_login).setVisible(true);
             navigationView.getMenu().findItem(R.id.nav_logout).setVisible(false);
             navigationView.getMenu().findItem(R.id.nav_prenotazioni).setVisible(false);
@@ -225,7 +230,7 @@ public class Requests extends AsyncTask<String, String, String> {
             navigationView.getMenu().findItem(R.id.nav_login).setVisible(true);
             navigationView.getMenu().findItem(R.id.nav_logout).setVisible(false);
             navigationView.getMenu().findItem(R.id.nav_prenotazioni).setVisible(false);
-            Toast.makeText(activity.getBaseContext(), "Not logged in", Toast.LENGTH_SHORT).show();
+            showToast("Not logged in");
             ((MainActivity) activity).setLoggedIn(false);
         }
     }
@@ -249,7 +254,7 @@ public class Requests extends AsyncTask<String, String, String> {
         } else if (result.getMessage().equals("Not logged in")) {
             logout("Not logged in");
         } else {
-            Toast.makeText(activity.getBaseContext(), result.getMessage(), Toast.LENGTH_SHORT).show();
+            showToast(result.getMessage());
         }
     }
 
@@ -272,7 +277,7 @@ public class Requests extends AsyncTask<String, String, String> {
         } else if (result.getMessage().equals("Not logged in")) {
             logout("Not logged in");
         } else {
-            Toast.makeText(activity.getBaseContext(), result.getMessage(), Toast.LENGTH_SHORT).show();
+            showToast(result.getMessage());
         }
     }
 
@@ -281,11 +286,11 @@ public class Requests extends AsyncTask<String, String, String> {
         jsonMessage<List<Object>> result = new Gson().fromJson(s, new TypeToken<jsonMessage<List<Object>>>() {
         }.getType());
         if (result.getMessage().equals("OK")) {
-            Toast.makeText(activity.getBaseContext(), "Prenotazione effettuata", Toast.LENGTH_SHORT).show();
+            showToast("Prenotazione effettuata");
         } else if (result.getMessage().equals("Not logged in")) {
             logout("Not logged in");
         } else {
-            Toast.makeText(activity.getBaseContext(), result.getMessage(), Toast.LENGTH_SHORT).show();
+            showToast(result.getMessage());
         }
     }
 
@@ -296,12 +301,26 @@ public class Requests extends AsyncTask<String, String, String> {
         Navigation.findNavController(activity, R.id.nav_host_fragment).popBackStack();
         navigationView.setCheckedItem(R.id.nav_prenota);
         Navigation.findNavController(activity, R.id.nav_host_fragment).navigate(R.id.nav_prenota);
-        Toast.makeText(activity.getBaseContext(), s, Toast.LENGTH_SHORT).show();
+        showToast(s);
         navigationView.getMenu().findItem(R.id.nav_login).setVisible(true);
         navigationView.getMenu().findItem(R.id.nav_logout).setVisible(false);
         navigationView.getMenu().findItem(R.id.nav_prenotazioni).setVisible(false);
         TextView username = navigationView.findViewById(R.id.usernameTextView);
         activity.findViewById(R.id.bookButton).setVisibility(View.GONE);
         username.setText(R.string.ospite);
+    }
+
+    public boolean isConnected() {
+        ConnectivityManager cm = (ConnectivityManager) activity.getBaseContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        return activeNetwork != null && activeNetwork.isConnectedOrConnecting();
+    }
+
+    public void showToast (String message){
+        if (toast != null) {
+            toast.cancel();
+        }
+        toast = Toast.makeText(activity.getBaseContext(), message, Toast.LENGTH_SHORT);
+        toast.show();
     }
 }

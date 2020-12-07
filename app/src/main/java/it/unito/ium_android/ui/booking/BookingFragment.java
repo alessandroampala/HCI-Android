@@ -160,6 +160,7 @@ public class BookingFragment extends Fragment implements View.OnClickListener {
                 s = requests[0].get();
                 result = new Gson().fromJson(s, new TypeToken<jsonMessage<List<Booking>>>() {
                 }.getType());
+                if(result == null) return null;
                 teacherBookings = result.getData();
             } catch (ExecutionException | InterruptedException e) {
                 e.printStackTrace();
