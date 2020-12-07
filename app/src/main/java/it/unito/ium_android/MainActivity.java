@@ -48,12 +48,18 @@ public class MainActivity extends AppCompatActivity {
             int id = menuItem.getItemId();
             switch (id) {
                 case R.id.nav_prenota:
+                    navController.popBackStack();
+                    navigationView.setCheckedItem(R.id.nav_prenota);
                     navController.navigate(R.id.nav_prenota);
                     break;
                 case R.id.nav_prenotazioni:
+                    navController.popBackStack();
+                    navigationView.setCheckedItem(R.id.nav_prenotazioni);
                     navController.navigate(R.id.nav_prenotazioni);
                     break;
                 case R.id.nav_login:
+                    navController.popBackStack();
+                    navigationView.setCheckedItem(R.id.nav_login);
                     navController.navigate(R.id.nav_login);
                     break;
                 case R.id.nav_logout:

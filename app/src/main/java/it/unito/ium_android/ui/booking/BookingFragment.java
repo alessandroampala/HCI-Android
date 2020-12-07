@@ -47,11 +47,11 @@ public class BookingFragment extends Fragment implements View.OnClickListener {
         View root = inflater.inflate(R.layout.fragment_booking, container, false);
 
         lesson = (Lesson) getArguments().getSerializable("lesson");
+        bookBtn = requireActivity().findViewById(R.id.bookButton);
         recordBookings = new ArrayList<>();
         bookingFragment = this;
 
-        if (((MainActivity) requireActivity()).isLoggedIn()) {
-            bookBtn = requireActivity().findViewById(R.id.bookButton);
+        if (bookingFragment.isAdded() && ((MainActivity) requireActivity()).isLoggedIn()) {
             bookBtn.setVisibility(View.VISIBLE);
 
             bookBtn.setOnClickListener(v -> {
@@ -364,7 +364,7 @@ public class BookingFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if (((MainActivity) requireActivity()).isLoggedIn() && bookBtn != null) {
+        if (bookingFragment.isAdded() && ((MainActivity) requireActivity()).isLoggedIn()) {
             bookBtn.setOnClickListener(null);
             bookBtn.setVisibility(View.GONE);
         }

@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
+import it.unito.ium_android.MainActivity;
 import it.unito.ium_android.R;
 import it.unito.ium_android.requests.Booking;
 import it.unito.ium_android.requests.CardsArchiveContainerAdapter;
@@ -83,7 +84,6 @@ public class PrenotazioniFragment extends Fragment {
             } catch (ExecutionException | InterruptedException e) {
                 e.printStackTrace();
             }
-
             try {
                 s = requests[1].get();
                 result[1] = new Gson().fromJson(s, new TypeToken<jsonMessage<List<Booking>>>() {
@@ -101,6 +101,10 @@ public class PrenotazioniFragment extends Fragment {
             RelativeLayout loadingLayout = this.view.findViewById(R.id.loadingPanel);
             RecyclerView cardsContainer = this.view.findViewById(R.id.cardsContainer);
             ConcatAdapter concatAdapter = new ConcatAdapter();
+
+            if(result[0].getMessage().equals("Not logged in") || result[1].getMessage().equals("Not logged in")){
+                new Requests(activity, "logout").logout("Not logged in");
+            }
 
             if (result[0].getMessage().equals("OK"))
                 lessonsArchive(result[0].getData(), concatAdapter);
