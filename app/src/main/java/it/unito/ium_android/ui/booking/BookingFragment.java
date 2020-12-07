@@ -45,7 +45,6 @@ public class BookingFragment extends Fragment implements View.OnClickListener {
     private MaterialButton bookBtn;
     private BookingFragment bookingFragment;
     private DrawerLayout drawerLayout;
-    private Integer removeRecordBooking;
 
 
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -223,10 +222,6 @@ public class BookingFragment extends Fragment implements View.OnClickListener {
                 break;
             default:
                 markBooking((TextView) v);
-                if (removeRecordBooking != null) {
-                    recordBookings.remove(removeRecordBooking);
-                    removeRecordBooking = null;
-                }
                 break;
         }
     }
@@ -239,7 +234,7 @@ public class BookingFragment extends Fragment implements View.OnClickListener {
         } else if (recordBookings.contains(lessonSlot(textView))) {
             textView.setBackgroundResource(R.drawable.green);
             textView.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
-            removeRecordBooking = lessonSlot(textView);
+            recordBookings.remove(lessonSlot(textView));
         }
 
     }
