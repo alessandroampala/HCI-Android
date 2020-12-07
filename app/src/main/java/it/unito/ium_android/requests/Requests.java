@@ -6,7 +6,6 @@ import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
-import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
@@ -59,7 +58,7 @@ public class Requests extends AsyncTask<String, String, String> {
     // Execute this method in background and make a request to the servlet
     @Override
     protected String doInBackground(String... strings) {
-        if(!isConnected()) return null;
+        if (!isConnected()) return null;
 
         StringBuilder concatStrings = new StringBuilder();
         HttpURLConnection connection = null;
@@ -72,16 +71,14 @@ public class Requests extends AsyncTask<String, String, String> {
 
         try {
             connection.setRequestMethod(strings[2]);
-        } catch (ProtocolException e) {
-            e.printStackTrace();
-        } catch (NullPointerException e) {
+        } catch (ProtocolException | NullPointerException e) {
             e.printStackTrace();
         }
         connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded; utf-8");
         connection.setRequestProperty("Content-Length", String.valueOf(strings[0].length()));
         if (this.className.equals("getSessionLogin") || this.className.equals("getUserBookings") || this.className.equals("oldUserBookings") || this.className.equals("cancelBooking") || this.className.equals("markBooking") || this.className.equals("logout") || this.className.equals("prenotazioniDocente") || this.className.equals("userBookings") || this.className.equals("bookLessons")) {
             SharedPreferences sharedPref = this.activity.getPreferences(Context.MODE_PRIVATE);
-            String sessionId = "";
+            String sessionId;
             if (sharedPref != null && sharedPref.contains("sessionId"))
                 sessionId = sharedPref.getString("sessionId", "");
             else
@@ -93,7 +90,7 @@ public class Requests extends AsyncTask<String, String, String> {
         connection.setConnectTimeout(500);
         try {
             connection.connect();
-        } catch (SocketTimeoutException e){
+        } catch (SocketTimeoutException e) {
             return null;
         } catch (IOException e) {
             e.printStackTrace();
@@ -138,8 +135,8 @@ public class Requests extends AsyncTask<String, String, String> {
     }
 
     /*
-    * Method called when the method above finish
-    * s -> data returned from the requests
+     * Method called when the method above finish
+     * s -> data returned from the requests
      */
     @Override
     protected void onPostExecute(String s) {
@@ -310,13 +307,15 @@ public class Requests extends AsyncTask<String, String, String> {
         username.setText(R.string.ospite);
     }
 
+    // Checks if connected
     public boolean isConnected() {
         ConnectivityManager cm = (ConnectivityManager) activity.getBaseContext().getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
         return activeNetwork != null && activeNetwork.isConnectedOrConnecting();
     }
 
-    public void showToast (String message){
+    // Shows a toast
+    public void showToast(String message) {
         if (toast != null) {
             toast.cancel();
         }

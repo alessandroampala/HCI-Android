@@ -19,13 +19,13 @@ import java.util.Objects;
 import it.unito.ium_android.R;
 import it.unito.ium_android.requests.Requests;
 
-
+// Login class
 public class LoginFragment extends Fragment {
 
+    // On create inflates view and manages button click
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_login, container, false);
-        //setRetainInstance(true);
 
         MaterialButton btnLogin = root.findViewById(R.id.btnLogin);
         btnLogin.setOnClickListener(view -> {
@@ -47,26 +47,4 @@ public class LoginFragment extends Fragment {
 
         return root;
     }
-
-    /*@Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        //Save the fragment's state here
-        outState.putString("username", Objects.requireNonNull(((TextInputLayout) getView().findViewById(R.id.usernameEditText)).getEditText()).getText().toString());
-        outState.putString("password", Objects.requireNonNull(((TextInputLayout) getView().findViewById(R.id.passwordEditText)).getEditText()).getText().toString());
-    }
-
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        if (savedInstanceState != null) {
-            //Restore the fragment's state here
-            String username = savedInstanceState.getString("username");
-            String password = savedInstanceState.getString("password");
-
-            (((TextInputLayout) getView().findViewById(R.id.usernameEditText)).getEditText()).setText(username);
-            (((TextInputLayout) getView().findViewById(R.id.passwordEditText)).getEditText()).setText(password);
-        }
-    }*/
-
 }

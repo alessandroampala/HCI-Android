@@ -39,12 +39,14 @@ import it.unito.ium_android.requests.SpinAdapterMaterie;
 import it.unito.ium_android.requests.Teacher;
 import it.unito.ium_android.requests.jsonMessage;
 
+// Prenota class
 public class PrenotaFragment extends Fragment {
 
     private String materia = "";
     private String docente = "";
     private int firstTimeSpinner = 0;
 
+    // On create inflates view, manages listeners for spinners and for the refresh action
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_prenota, container, false);
@@ -103,6 +105,7 @@ public class PrenotaFragment extends Fragment {
         return root;
     }
 
+    // Requests teachers, courses and lessons
     private void makeRequests(View root) {
         Requests teacherRequests = new Requests(getActivity(), "docenti", root);
 
@@ -129,6 +132,7 @@ public class PrenotaFragment extends Fragment {
         new Task(root, getActivity()).execute(teacherRequests, courseRequests, lessonRequests);
     }
 
+    // Requests made by spinners every time an item is selected
     private void makeSpinnerRequests(View root) {
         Requests request = new Requests(getActivity(), "lessons", root);
         try {
@@ -142,21 +146,25 @@ public class PrenotaFragment extends Fragment {
         new Task(root, getActivity()).execute(request);
     }
 
+    // Resets firstTimeSpinner
     @Override
     public void onResume() {
         super.onResume();
         firstTimeSpinner = 0;
     }
 
+    // Async task used to track the requests
     public static class Task extends AsyncTask<Requests, Void, ArrayList<String>> {
         private final View view;
         private final Activity activity;
 
+        // Constructor
         public Task(View view, Activity activity) {
             this.view = view;
             this.activity = activity;
         }
 
+        // Gets data from the requests and returns it to the onPostExecute
         @Override
         protected ArrayList<String> doInBackground(Requests... requests) {
             ArrayList<String> s = new ArrayList<>();
@@ -189,11 +197,12 @@ public class PrenotaFragment extends Fragment {
             return s;
         }
 
+        // if s is null then there is no connection otherwise loads data
         @Override
         protected void onPostExecute(ArrayList<String> s) {
             super.onPostExecute(s);
 
-            if(s == null) return;
+            if (s == null) return;
 
             if (s.size() > 1) {
                 if (s.get(0) == null || s.get(1) == null || s.get(2) == null) {
@@ -212,6 +221,7 @@ public class PrenotaFragment extends Fragment {
             }
         }
 
+        // Creates an adapter with the lessons data for the cards
         private void lessons(String s) {
             jsonMessage<List<Lesson>> result = new Gson().fromJson(s, new TypeToken<jsonMessage<List<Lesson>>>() {
             }.getType());
@@ -246,6 +256,7 @@ public class PrenotaFragment extends Fragment {
             }
         }
 
+        // Creates an adapter for spinner with teachers data
         private void docenti(String s) {
             jsonMessage<List<Teacher>> result = new Gson().fromJson(s, new TypeToken<jsonMessage<List<Teacher>>>() {
             }.getType());
@@ -270,6 +281,7 @@ public class PrenotaFragment extends Fragment {
             }
         }
 
+        // Creates an adapter for spinner with courses data
         private void materie(String s) {
             jsonMessage<List<Course>> result = new Gson().fromJson(s, new TypeToken<jsonMessage<List<Course>>>() {
             }.getType());

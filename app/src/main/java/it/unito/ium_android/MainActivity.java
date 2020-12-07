@@ -1,19 +1,11 @@
 package it.unito.ium_android;
 
-import android.content.Context;
 import android.os.Bundle;
-import android.os.Parcelable;
-import android.util.AttributeSet;
-import android.view.View;
-import android.widget.Toast;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -23,11 +15,16 @@ import com.google.android.material.navigation.NavigationView;
 
 import it.unito.ium_android.requests.Requests;
 
+// Main activity class
 public class MainActivity extends AppCompatActivity {
 
     private AppBarConfiguration mAppBarConfiguration;
     private boolean loggedIn = false;
 
+    /*
+     * On create function
+     * Manage navigation
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -72,34 +69,11 @@ public class MainActivity extends AppCompatActivity {
 
             drawer.closeDrawer(GravityCompat.START);
 
-            /*if (savedInstanceState != null) {
-                //Restore the fragment's instance
-                navigationView.setCheckedItem(savedInstanceState.getInt("checkedItem"));
-                Toast.makeText(getBaseContext(), "c'è bundle" + savedInstanceState.getInt("checkedItem") + " mentre id corrente è" + navigationView.getCheckedItem(),Toast.LENGTH_SHORT).show();
-            }*/
-
             return true;
         });
     }
 
-    /*@Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        //Save the fragment's instance
-        Fragment f;
-        if (getSupportFragmentManager().getBackStackEntryCount() == 0)
-            f = getSupportFragmentManager().getFragments().get(0);
-        else
-            f = getSupportFragmentManager().getFragments().get(getSupportFragmentManager().getBackStackEntryCount() - 1);
-        getSupportFragmentManager().putFragment(outState, "myFragmentName", f);
-
-        NavigationView navigationView = findViewById(R.id.nav_view);
-        //navigationView.getCheckedItem();
-        outState.putInt("checkedItem", navigationView.getCheckedItem().getItemId());
-        Toast.makeText(getBaseContext(), "sto salvando " + navigationView.getCheckedItem() + "con itemid" + navigationView.getCheckedItem().getItemId(),Toast.LENGTH_SHORT).show();
-
-    }*/
-
+    // Called whenever the user chooses to navigate Up within your application's activity hierarchy from the action bar
     @Override
     public boolean onSupportNavigateUp() {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
@@ -107,6 +81,7 @@ public class MainActivity extends AppCompatActivity {
                 || super.onSupportNavigateUp();
     }
 
+    // On resume method checks the session status
     @Override
     protected void onResume() {
         super.onResume();
@@ -116,10 +91,12 @@ public class MainActivity extends AppCompatActivity {
         requests.execute(data, Requests.url, method);
     }
 
+    // Sets the loggedIn variable
     public void setLoggedIn(boolean loggedIn) {
         this.loggedIn = loggedIn;
     }
 
+    // Gets the loggedIn variable
     public boolean isLoggedIn() {
         return loggedIn;
     }

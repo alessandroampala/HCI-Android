@@ -34,7 +34,7 @@ import it.unito.ium_android.requests.Lesson;
 import it.unito.ium_android.requests.Requests;
 import it.unito.ium_android.requests.jsonMessage;
 
-@SuppressLint("StaticFieldLeak")
+// Booking class
 public class BookingFragment extends Fragment implements View.OnClickListener {
 
     private final List<TextView> week = new ArrayList<>();
@@ -46,7 +46,7 @@ public class BookingFragment extends Fragment implements View.OnClickListener {
     private BookingFragment bookingFragment;
     private DrawerLayout drawerLayout;
 
-
+    // On create adds book button and manages the click. Button tries to book and then reload the view
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_booking, container, false);
@@ -111,6 +111,7 @@ public class BookingFragment extends Fragment implements View.OnClickListener {
         return root;
     }
 
+    // Gets teacher bookings and the user bookings
     private void executeQuery(View root) {
         Requests prenotazioniDocenteRequests = new Requests(getActivity(), "prenotazioniDocente");
         try {
@@ -129,6 +130,7 @@ public class BookingFragment extends Fragment implements View.OnClickListener {
         new Task(this, root).execute(prenotazioniDocenteRequests, userBookingsRequests);
     }
 
+    // Adds buttons to an ArrayList
     private void addWeekBtn(View root) {
         week.add(root.findViewById(R.id.lun));
         week.add(root.findViewById(R.id.mar));
@@ -142,15 +144,18 @@ public class BookingFragment extends Fragment implements View.OnClickListener {
         week.add(root.findViewById(R.id.date19));
     }
 
+    // Async task used to track getBookings requests
     private static class Task extends AsyncTask<Requests, Void, Void> {
         private final BookingFragment bookingFragment;
         private final View view;
 
+        // Constructor
         Task(BookingFragment bookingFragment, View view) {
             this.view = view;
             this.bookingFragment = bookingFragment;
         }
 
+        // Waits the results and stores the data
         @Override
         protected Void doInBackground(Requests... requests) {
             String s;
@@ -160,7 +165,7 @@ public class BookingFragment extends Fragment implements View.OnClickListener {
                 s = requests[0].get();
                 result = new Gson().fromJson(s, new TypeToken<jsonMessage<List<Booking>>>() {
                 }.getType());
-                if(result == null) return null;
+                if (result == null) return null;
                 teacherBookings = result.getData();
             } catch (ExecutionException | InterruptedException e) {
                 e.printStackTrace();
@@ -177,6 +182,7 @@ public class BookingFragment extends Fragment implements View.OnClickListener {
             return null;
         }
 
+        // Loada the view as monday
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
@@ -187,12 +193,14 @@ public class BookingFragment extends Fragment implements View.OnClickListener {
 
     }
 
+    // Resets week navigation
     private void resetWeekColor(TextView v) {
         for (int i = 0; i < 5; i++)
             week.get(i).setTextColor(Color.GRAY);
         v.setTextColor(0xFF3F51B5);
     }
 
+    // Manages onclick events
     @Override
     public void onClick(View v) {
         switch (((TextView) v).getText().toString()) {
@@ -227,6 +235,7 @@ public class BookingFragment extends Fragment implements View.OnClickListener {
         }
     }
 
+    // Marks and unmarks bookings on click
     private void markBooking(TextView textView) {
         if (!recordBookings.contains(lessonSlot(textView))) {
             textView.setBackgroundResource(R.drawable.dark_green);
@@ -240,16 +249,19 @@ public class BookingFragment extends Fragment implements View.OnClickListener {
 
     }
 
+    // When user changes the day restore the marked bookings
     private void restoreBookings(TextView textView) {
         textView.setBackgroundResource(R.drawable.dark_green);
         textView.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_baseline_check_24, 0, 0);
     }
 
+    // Stores requests data
     private void setBookings(List<Booking> userBookings, List<Booking> teacherBookings) {
         this.userBookings = userBookings;
         this.teacherBookings = teacherBookings;
     }
 
+    // Update the view with the requests data
     private void updateBookings(int start, int end) {
         for (int i = 5; i < 10; i++) {
             week.get(i).setBackgroundResource(R.drawable.green);
@@ -357,6 +369,7 @@ public class BookingFragment extends Fragment implements View.OnClickListener {
             }
     }
 
+    // Converts hours to lessonSlot
     private Integer lessonSlot(TextView v) {
         switch (v.getText().toString()) {
             case "15-16":
@@ -374,6 +387,7 @@ public class BookingFragment extends Fragment implements View.OnClickListener {
         }
     }
 
+    // On destroy hides book button, checks the session if logged in and unlocks the sidebar
     @Override
     public void onDestroy() {
         super.onDestroy();

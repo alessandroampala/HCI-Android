@@ -32,9 +32,11 @@ import it.unito.ium_android.requests.CardsArchiveContainerAdapter;
 import it.unito.ium_android.requests.Requests;
 import it.unito.ium_android.requests.jsonMessage;
 
+// Pretotazioni class
 public class PrenotazioniFragment extends Fragment {
     public static PrenotazioniFragment instance; //singleton pattern
 
+    // On create makes requests, inflates layout and sets refresh action listener
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_prenotazioni, container, false);
@@ -50,6 +52,7 @@ public class PrenotazioniFragment extends Fragment {
         return root;
     }
 
+    // Requests Active bookings and old bookings
     private void makeRequests(View root) {
         Requests userBookingsRequests = new Requests(getActivity(), "getUserBookings", root);
         String data = "action=userBooking&isAndroid=true";
@@ -64,15 +67,18 @@ public class PrenotazioniFragment extends Fragment {
         new Task(root, getActivity()).execute(userBookingsRequests, oldUserBookingsRequests);
     }
 
+    // Async task used to track requests
     public static class Task extends AsyncTask<Requests, Void, jsonMessage<List<Booking>>[]> {
         private final View view;
         private final Activity activity;
 
+        // Constructor
         public Task(View view, Activity activity) {
             this.view = view;
             this.activity = activity;
         }
 
+        // Background actions, gets results and returns them to onPostExecute
         @Override
         protected jsonMessage<List<Booking>>[] doInBackground(Requests... requests) {
             String s;
@@ -96,11 +102,12 @@ public class PrenotazioniFragment extends Fragment {
             return result;
         }
 
+        // Checks if there is no network otherwise loads data if logged in
         @Override
         protected void onPostExecute(jsonMessage<List<Booking>>[] result) {
             super.onPostExecute(result);
 
-            if(result[0] == null) //there's no network
+            if (result[0] == null) //there's no network
             {
                 return;
             }
@@ -109,7 +116,7 @@ public class PrenotazioniFragment extends Fragment {
             RecyclerView cardsContainer = this.view.findViewById(R.id.cardsContainer);
             ConcatAdapter concatAdapter = new ConcatAdapter();
 
-            if(result[0].getMessage().equals("Not logged in") || result[1].getMessage().equals("Not logged in")){
+            if (result[0].getMessage().equals("Not logged in") || result[1].getMessage().equals("Not logged in")) {
                 new Requests(activity, "logout").logout("Not logged in");
             }
 
@@ -131,6 +138,7 @@ public class PrenotazioniFragment extends Fragment {
             cardsContainer.setAdapter(concatAdapter);
         }
 
+        // Adds adapter for the cards with the active lessons data
         private void lessonsArchive(List<Booking> userBookings, ConcatAdapter concatAdapter) {
             TextView noBooking = this.view.findViewById(R.id.noBooking);
             if (userBookings.isEmpty()) {
@@ -142,6 +150,7 @@ public class PrenotazioniFragment extends Fragment {
             concatAdapter.addAdapter(cardsContainerAdapter);
         }
 
+        // Adds adapter for the cards with the old lessons data
         private void oldLessonsArchive(List<Booking> oldUserBookings, ConcatAdapter concatAdapter) {
             RelativeLayout loadingLayout = this.view.findViewById(R.id.loadingPanel);
             if (oldUserBookings.isEmpty()) {
