@@ -62,9 +62,18 @@ public class MainActivity extends AppCompatActivity {
                 boolean isConnected = activeNetwork != null &&
                         activeNetwork.isConnectedOrConnecting();
                 if (isConnected) {
-                    Navigation.findNavController((Activity) context, R.id.nav_host_fragment).popBackStack();
-                    navigationView.setCheckedItem(R.id.nav_prenota);
-                    Navigation.findNavController((Activity) context, R.id.nav_host_fragment).navigate(R.id.nav_prenota);
+                    NavController navController = Navigation.findNavController((Activity) context, R.id.nav_host_fragment);
+                    int oldDestId = -1;
+                    if (navController.getCurrentDestination() != null)
+                         oldDestId = navController.getCurrentDestination().getId();
+                    navController.popBackStack();
+
+                    if (oldDestId != -1) {
+                        navigationView.setCheckedItem(navigationView.getCheckedItem());
+                        navController.navigate(oldDestId);
+                    } else {
+                        navController.navigate(R.id.nav_prenota);
+                    }
                 }
             }
         };
