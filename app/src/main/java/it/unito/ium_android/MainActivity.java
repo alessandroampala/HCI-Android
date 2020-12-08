@@ -1,5 +1,12 @@
 package it.unito.ium_android;
 
+import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -33,6 +40,35 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         NavigationView navigationView = findViewById(R.id.nav_view);
+
+        BroadcastReceiver connectivityReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                ConnectivityManager cm =
+                        (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+
+                NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+                boolean isConnected = activeNetwork != null &&
+                        activeNetwork.isConnectedOrConnecting();
+                if (isConnected) {
+                    NavController navController = Navigation.findNavController((Activity) context, R.id.nav_host_fragment);
+                    int oldDestId = -1;
+                    if (navController.getCurrentDestination() != null)
+                         oldDestId = navController.getCurrentDestination().getId();
+                    navController.popBackStack();
+
+                    if (oldDestId != -1) {
+                        navigationView.setCheckedItem(navigationView.getCheckedItem());
+                        navController.navigate(oldDestId);
+                    } else {
+                        navController.navigate(R.id.nav_prenota);
+                    }
+                }
+            }
+        };
+
+        IntentFilter intentFilter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
+        registerReceiver(connectivityReceiver, intentFilter);
 
         mAppBarConfiguration = new AppBarConfiguration.Builder(
                 R.id.nav_login, R.id.nav_prenota, R.id.nav_prenotazioni, R.id.nav_logout)
@@ -100,6 +136,4 @@ public class MainActivity extends AppCompatActivity {
     public boolean isLoggedIn() {
         return loggedIn;
     }
-
-
 }
