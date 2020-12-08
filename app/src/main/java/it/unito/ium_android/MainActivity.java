@@ -27,6 +27,7 @@ public class MainActivity extends AppCompatActivity {
 
     private AppBarConfiguration mAppBarConfiguration;
     private boolean loggedIn = false;
+    private boolean wasConnected = false;
 
     /*
      * On create function
@@ -41,6 +42,7 @@ public class MainActivity extends AppCompatActivity {
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         NavigationView navigationView = findViewById(R.id.nav_view);
 
+        Activity act = this;
         BroadcastReceiver connectivityReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
@@ -50,7 +52,13 @@ public class MainActivity extends AppCompatActivity {
                 NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
                 boolean isConnected = activeNetwork != null &&
                         activeNetwork.isConnectedOrConnecting();
-                if (isConnected) {
+                if (isConnected && !wasConnected) {
+                    // Request to fix navigation drawer options
+                    Requests requests = new Requests(act, "getSessionLogin");
+                    String data = "action=getSessionLogin";
+                    String method = "POST";
+                    requests.execute(data, Requests.url, method);
+
                     NavController navController = Navigation.findNavController((Activity) context, R.id.nav_host_fragment);
                     int oldDestId = -1;
                     if (navController.getCurrentDestination() != null)
@@ -58,12 +66,20 @@ public class MainActivity extends AppCompatActivity {
                     navController.popBackStack();
 
                     if (oldDestId != -1) {
-                        navigationView.setCheckedItem(navigationView.getCheckedItem());
-                        navController.navigate(oldDestId);
+                        if(oldDestId == R.id.nav_booking)
+                        {
+                            navigationView.setCheckedItem(R.id.nav_prenota);
+                            navController.navigate(R.id.nav_prenota);
+                        }
+                        else {
+                            navigationView.setCheckedItem(navigationView.getCheckedItem());
+                            navController.navigate(oldDestId);
+                        }
                     } else {
                         navController.navigate(R.id.nav_prenota);
                     }
                 }
+                wasConnected = isConnected;
             }
         };
 
